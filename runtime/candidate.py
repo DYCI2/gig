@@ -1,0 +1,2 @@
+class Candidate:
+    pass
