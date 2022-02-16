@@ -1,8 +1,41 @@
-from abc import ABC
+import logging
+from abc import ABC, abstractmethod
+from typing import Optional
+
+from main.candidate import Candidate
+from main.candidates import Candidates
+from main.corpus import Corpus
+from main.corpus_event import CorpusEvent
+from main.influence import Influence
 
 
 class Prospector(ABC):
-    pass
+    def __init__(self):
+        self.logger = logging.getLogger(__name__)
+
+    @abstractmethod
+    def learn_event(self, event: CorpusEvent, **kwargs) -> None:
+        """ """
+
+    @abstractmethod
+    def read_memory(self, corpus: Corpus, **kwargs) -> None:
+        """ """
+
+    @abstractmethod
+    def process(self, influence: Influence, **kwargs) -> None:
+        """ """
+
+    @abstractmethod
+    def get_candidates(self, **kwargs) -> Candidates:
+        """ """
+
+    @abstractmethod
+    def clear(self) -> None:
+        """ """
+
+    @abstractmethod
+    def feedback(self, event: Optional[Candidate], **kwargs) -> None:
+        """ """
 
 
 class Dyci2Prospector(Prospector):

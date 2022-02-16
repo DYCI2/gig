@@ -1,8 +1,28 @@
-from abc import ABC
+from abc import ABC, abstractmethod
+from typing import List, Type, Optional
+
+from main.corpus_event import CorpusEvent
+from main.feature import Feature
 
 
 class Corpus(ABC):
-    pass
+    def __init__(self, events: List[CorpusEvent], feature_types: Optional[List[Type[Feature]]] = None):
+        # TODO[B4]: handle feature types (if not provided, gather all from events. Also: pre-compute feature values
+        self.events: List[CorpusEvent] = events
+
+    @classmethod
+    @abstractmethod
+    def build(cls, *args, **kwargs) -> 'Corpus':
+        """ """
+
+    @classmethod
+    @abstractmethod
+    def from_file(cls, filepath: str, **kwargs) -> 'Corpus':
+        """ """
+
+    @abstractmethod
+    def export(self, filepath: str, **kwargs) -> None:
+        """ """
 
 
 class FreeCorpus(Corpus):

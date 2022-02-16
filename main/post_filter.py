@@ -1,9 +1,22 @@
-from abc import ABC
+from abc import ABC, abstractmethod
+from typing import Optional
+
+from main.candidates import Candidates
 
 
 class PostFilter(ABC):
-    pass
 
+    @abstractmethod
+    def filter(self, candidates: Candidates) -> Candidates:
+        """ """
+
+    @abstractmethod
+    def feedback(self, candidates: Optional[Candidates], **kwargs) -> None:
+        """ """
+
+    @abstractmethod
+    def clear(self) -> None:
+        """ """
 
 class CustomFilter(ABC):
     pass

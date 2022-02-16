@@ -1,21 +1,28 @@
-from abc import ABC
+from typing import TypeVar, Generic
+
+from main.corpus_event import CorpusEvent
+from main.feature import Feature
+from main.label import Label
+
+T = TypeVar('T')
 
 
-class Influence(ABC):
+class Influence(Generic[T]):
+    def __init__(self, influence: T):
+        self.influence: T = influence
+
+
+class CorpusInfluence(Influence[CorpusEvent]):
     pass
 
 
-class CorpusInfluence:
+class FeatureInfluence(Influence[Feature]):
     pass
 
 
-class FeatureInfluence:
+class LabelInfluence(Influence[Label]):
     pass
 
 
-class LabelInfluence:
-    pass
-
-
-class TriggerInfluence:
+class TriggerInfluence(Influence[None]):
     pass
