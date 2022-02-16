@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Union
 
-from main.feature import Feature
-from main.label import Label
+from merge.main.feature import Feature
+from merge.main.label import Label
 
 
 class Transform(ABC):

@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List, Type, Optional
 
-from main.corpus_event import CorpusEvent
-from main.feature import Feature
+from merge.main.corpus_event import CorpusEvent
+from merge.main.feature import Feature
 
 
 class Corpus(ABC):

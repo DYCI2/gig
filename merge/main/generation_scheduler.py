@@ -2,12 +2,12 @@ import logging
 from abc import ABC, abstractmethod
 from typing import List
 
-from main.corpus import Corpus
-from main.corpus_event import CorpusEvent
-from main.generator import Generator
-from main.query import Query
-from stubs.rendering import Message
-from stubs.time import Time
+from merge.corpus import Corpus
+from merge.main.corpus_event import CorpusEvent
+from merge.main.generator import Generator
+from merge.main.query import Query
+from merge.stubs.rendering import Message
+from merge.stubs.time import Time
 
 
 class GenerationScheduler(ABC):

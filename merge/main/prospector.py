@@ -2,11 +2,11 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from main.candidate import Candidate
-from main.candidates import Candidates
-from main.corpus import Corpus
-from main.corpus_event import CorpusEvent
-from main.influence import Influence
+from merge.main.candidate import Candidate
+from merge.main.candidates import Candidates
+from merge.corpus import Corpus
+from merge.main.corpus_event import CorpusEvent
+from merge.main.influence import Influence
 
 
 class Prospector(ABC):

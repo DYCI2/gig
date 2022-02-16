@@ -1,8 +1,9 @@
-from typing import Dict, Union, Type, List
+import logging
+from typing import Dict, Union, Type, List, Optional
 
-from main.feature import Feature
-from main.label import Label
-from stubs.note import Note
+from merge.main.feature import Feature
+from merge.main.label import Label
+from merge.stubs.note import Note
 
 
 class RelativeSchedulable:
@@ -26,9 +27,16 @@ class CorpusEvent:
                  labels: Dict[Union[str, Type[Label]], Label],
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.logger = logging.getLogger(__name__)
         self.index: int = index
         self.features: Dict[Union[str, Type[Feature]], Feature] = features
         self.labels: Dict[Union[str, Type[Label]], Label] = labels
+
+    def get_feature(self, feature_type: Union[str, Type[Feature]]) -> Optional[Feature]:
+        return self.features.get(feature_type)
+
+    def get_label(self, label_type: Union[str, Type[Label]]) -> Optional[Label]:
+        return self.labels.get(label_type)
 
 
 class MidiEvent(CorpusEvent, RelativeSchedulable, AbsoluteSchedulable):

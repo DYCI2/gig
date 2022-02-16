@@ -2,14 +2,14 @@ import logging
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from main.candidate import Candidate
-from main.corpus import Corpus
-from main.corpus_event import CorpusEvent
-from main.jury import Jury
-from main.merge_handler import MergeHandler
-from main.post_filter import PostFilter
-from main.prospector import Prospector
-from main.query import Query
+from merge.main.candidate import Candidate
+from merge.corpus import Corpus
+from merge.main.corpus_event import CorpusEvent
+from merge.main.jury import Jury
+from merge.main.merge_handler import MergeHandler
+from merge.main.post_filter import PostFilter
+from merge.main.prospector import Prospector
+from merge.main.query import Query
 
 
 class Generator(ABC):

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from main.candidates import Candidates
+from merge.main.candidates import Candidates
 
 
 class MergeHandler(ABC):

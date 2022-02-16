@@ -1,9 +1,9 @@
 import logging
 from typing import Optional, List
 
-from main.influence import Influence
-from stubs.pathspec import PathSpec
-from stubs.time import Time
+from merge.main.influence import Influence
+from merge.stubs.pathspec import PathSpec
+from merge.stubs.time import Time
 
 
 class Query:

@@ -1,7 +1,7 @@
 from typing import Optional
 
-from main.corpus_event import CorpusEvent
-from stubs.transform import Transform
+from merge.main.corpus_event import CorpusEvent
+from merge.stubs.transform import Transform
 
 
 class Candidate:

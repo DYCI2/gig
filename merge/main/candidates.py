@@ -3,9 +3,9 @@ from typing import List, Type, Union
 
 import numpy as np
 
-from main.candidate import Candidate
-from main.feature import Feature
-from stubs.transform import Transform
+from merge.main.candidate import Candidate
+from merge.main.feature import Feature
+from merge.stubs.transform import Transform
 
 
 class Candidates(ABC):
@@ -42,6 +42,7 @@ class Candidates(ABC):
 
 
 class DiscreteCandidates(Candidates):
+    pass
 
 
 class ContinuousCandidates(Candidates):

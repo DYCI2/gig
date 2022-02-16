@@ -1,14 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from main.candidate import Candidate
-from main.candidates import Candidates
+from merge.main.candidates import Candidates
 
 
-class Jury(ABC):
+class PostFilter(ABC):
 
     @abstractmethod
-    def decide(self, candidates: Candidates) -> Optional[Candidate]:
+    def filter(self, candidates: Candidates) -> Candidates:
         """ """
 
     @abstractmethod
@@ -18,3 +17,6 @@ class Jury(ABC):
     @abstractmethod
     def clear(self) -> None:
         """ """
+
+class CustomFilter(ABC):
+    pass
