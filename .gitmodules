@@ -1,6 +1,0 @@
-[submodule "Somax2"]
-	path = Somax2
-	url = git@github.com:DYCI2/Somax2.git
-[submodule "DYCI2-Python-Library"]
-	path = DYCI2-Python-Library
-	url = git@github.com:DYCI2/DYCI2-Python-Library.git
