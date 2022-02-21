@@ -78,9 +78,9 @@ class BaseCandidates(Candidates):
     pass
 
 
+class DiscreteCandidates(Candidates):
+    pass # TODO: Implementation ongoing in somax.peaks
 
-class DiscretizedCandidates(Candidates):
-    pass
 
 
 class MatrixCandidates(Candidates):

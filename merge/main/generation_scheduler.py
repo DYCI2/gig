@@ -1,8 +1,9 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
 from merge.corpus import Corpus
+from merge.main.candidate import Candidate
 from merge.main.corpus_event import CorpusEvent
 from merge.main.generator import Generator
 from merge.main.query import Query
@@ -25,6 +26,10 @@ class GenerationScheduler(ABC):
     def update_time(self, time: Time) -> List[Message]:
         """ """
 
+    def _on_feedback(self, event: Optional[Candidate], **kwargs) -> None:
+        """ Override this function to implement manual behaviour on feedback """
+        pass
+
     def read_memory(self, corpus: Corpus, **kwargs) -> None:
         self.clear()
         self.generator.read_memory(corpus, **kwargs)
@@ -34,6 +39,10 @@ class GenerationScheduler(ABC):
 
     def clear(self) -> None:
         raise NotImplementedError("This needs to handle scheduling & state flushing")
+
+    def feedback(self, event: Optional[Candidate], **kwargs) -> None:
+        self._on_feedback(event, **kwargs)
+        self.generator.feedback(event, **kwargs)
 
 
 class Dyci2GenerationScheduler(GenerationScheduler):

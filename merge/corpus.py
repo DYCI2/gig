@@ -39,6 +39,9 @@ class Corpus(Generic[E], ABC):
     def precompute_feature_types(events: List[E]) -> List[Type[Feature]]:
         raise NotImplemented("Not implemented")  # TODO[B6]
 
+    def get_features_of_type(self, feature_type: Type[Feature]) -> List[Feature]:
+        return [e.get_feature(feature_type) for e in self.events]
+
 
 class FreeCorpus(Corpus[CorpusEvent]):
     pass

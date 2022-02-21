@@ -2,8 +2,8 @@ import logging
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from merge.main.candidate import Candidate
 from merge.corpus import Corpus
+from merge.main.candidate import Candidate
 from merge.main.corpus_event import CorpusEvent
 from merge.main.jury import Jury
 from merge.main.merge_handler import MergeHandler
@@ -25,9 +25,9 @@ class Generator(ABC):
     def process_query(self, query: Query, **kwargs) -> List[Optional[Candidate]]:
         pass
 
-    @abstractmethod
     def _on_feedback(self, event: Optional[Candidate], **kwargs) -> None:
-        """ """
+        """ Override this function to implement manual behaviour on feedback """
+        pass
 
     @abstractmethod
     def _on_clear(self) -> None:

@@ -26,8 +26,17 @@ class Prospector(ABC):
         """ """
 
     @abstractmethod
-    def get_candidates(self, **kwargs) -> Candidates:
-        """ """
+    def peek_candidates(self) -> Candidates:
+        """ # TODO: Proper docstring
+            Get the candidates without modifying the prospector's internal state. Note that in most runtime cases,
+            this behaviour is undesired. The candidates returned from `peek_candidates` should not be modified - they
+            are not a copy. This should only be used to gather statistics, etc. """
+
+    @abstractmethod
+    def pop_candidates(self, **kwargs) -> Candidates:
+        """ TODO: Proper docstring
+            Note! Depending on implementation, may or may not remove or alter the candidates
+                  in the prospector's internal state. """
 
     @abstractmethod
     def clear(self) -> None:
