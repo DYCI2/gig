@@ -7,10 +7,19 @@ from merge.main.label import Label
 
 class Transform(ABC):
 
+    @classmethod
     @abstractmethod
-    def apply(self, data: Union[Label, Feature]) -> Union[Label, Feature]:
+    def from_id(cls, transform_id: int) -> 'Transform':
         """ """
 
     @abstractmethod
-    def inverse(self, data: Union[Label, Feature]) -> Union[Label, Feature]:
+    def apply(self, obj: Union[Label, Feature]) -> Union[Label, Feature]:
+        """ """
+
+    @abstractmethod
+    def inverse(self, obj: Union[Label, Feature]) -> Union[Label, Feature]:
+        """ """
+
+    @abstractmethod
+    def to_id(self) -> int:
         """ """

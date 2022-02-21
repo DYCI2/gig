@@ -5,14 +5,14 @@ class Label(ABC):
     pass  # TODO: Empty interface for now
 
 
-class IntLabel:
+class IntLabel(Label):
     def __init__(self, label: int):
         self.label: int = label
 
 
-class ListLabel:
+class ListLabel(Label):
     pass  # TODO: DYCI2 implementation
 
 
-class ChordLabel:
+class ChordLabel(Label):
     pass  # TODO: DYCI2 implementation

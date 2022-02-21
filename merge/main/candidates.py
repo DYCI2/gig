@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Type, Union
+from typing import List, Type, Union, Optional
 
 import numpy as np
 
@@ -10,8 +10,27 @@ from merge.stubs.transform import Transform
 
 class Candidates(ABC):
 
+    # TODO[B2] This cannot be implemented until we have a good solution for transforms
+    # @classmethod
+    # @abstractmethod
+    # def create_empty(cls, associated_corpus: Corpus, *args, **kwargs) -> 'Candidates':
+    #     """ """
+
+    @classmethod
     @abstractmethod
-    def get_feature(self, feature: Union[Type[Feature], str]) -> np.ndarray:
+    def copy(cls, other) -> 'Candidates':
+        """ :raises TypeError if trying to copy `Candidates` as an invalid type. """
+
+    @abstractmethod
+    def add(self, candidates: List[Candidate], **kwargs) -> None:
+        """ :raises CorpusError if adding candidates that violate Corpus constraints of Candidates subclasses """
+
+    @abstractmethod
+    def get_feature_array(self, feature: Union[Type[Feature], str]) -> np.ndarray:
+        """ """
+
+    @abstractmethod
+    def get_candidate(self, index: int) -> Candidate:
         """ """
 
     @abstractmethod
@@ -35,19 +54,33 @@ class Candidates(ABC):
         """ """
 
     @abstractmethod
-    def scale(self, factors: Union[float, np.ndarray]) -> None:
+    def remove(self, indices: Union[int, np.ndarray]) -> None:
+        """ :raises IndexError if an index is out of bounds """
+
+    @abstractmethod
+    def is_empty(self) -> bool:
+        """ """
+
+    @abstractmethod
+    def size(self) -> int:
+        """ """
+
+    @abstractmethod
+    def scale(self, factors: Union[float, np.ndarray], indices: Optional[np.ndarray] = None) -> None:
         """ TODO: Proper docstring
-            factors: should either be a scalar (float) or the same shape as the content returned from
-                     `get_candidates`, `get_scores`, etc. """
+            factors: should either be
+                a scalar (float) or
+                an array of the same shape as the content returned from `get_candidates`, `get_scores`, etc. or
+                a list factors in combination with an index map"""
 
 
-class DiscreteCandidates(Candidates):
+class BaseCandidates(Candidates):
     pass
 
 
-class ContinuousCandidates(Candidates):
-    def get_times(self) -> np.ndarray:
-        pass
+
+class DiscretizedCandidates(Candidates):
+    pass
 
 
 class MatrixCandidates(Candidates):
