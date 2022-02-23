@@ -34,3 +34,24 @@ class ResourceError(Exception):
 
     def __init__(self, err):
         super().__init__(err)
+
+
+class QueryError(Exception):
+    """ Raised if a Query or Influence is invalid """
+
+    def __init__(self, err):
+        super().__init__(err)
+
+
+class CandidatesError(Exception):
+    """ Raised when an invalid `Candidates` class is used """
+
+    def __init__(self, err):
+        super().__init__(err)
+
+
+class FilterError(Exception):
+    """ Raised when an error occurs in a `Filter` """
+
+    def __init__(self, err):
+        super().__init__(err)

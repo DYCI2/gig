@@ -13,17 +13,21 @@ from merge.main.query import Query
 
 
 class Generator(ABC):
-    def __init__(self, prospectors: List[Prospector], merge_handler: MergeHandler, post_filters: List[PostFilter],
-                 jury: Jury):
+    def __init__(self, merge_handler: MergeHandler, post_filters: List[PostFilter],
+                 jury: Jury, prospectors: Optional[List[Prospector]] = None):
         self.logger = logging.getLogger(__name__)
-        self._prospectors: List[Prospector] = prospectors
         self._merge_handler: MergeHandler = merge_handler
         self._post_filters: List[PostFilter] = post_filters  # TODO: Should be dict/component
         self._jury: Jury = jury
 
+        if prospectors is not None:
+            self._prospectors: List[Prospector] = prospectors
+        else:
+            self._prospectors = []
+
     @abstractmethod
     def process_query(self, query: Query, **kwargs) -> List[Optional[Candidate]]:
-        pass
+        """ Query the Generator with new information in order to update its internal state """
 
     def _on_feedback(self, event: Optional[Candidate], **kwargs) -> None:
         """ Override this function to implement manual behaviour on feedback """
@@ -71,4 +75,5 @@ class SomaxGenerator(Generator):
 
 
 class Dyci2Generator(Generator):
-    pass
+    def peek_output(self) -> List[Optional[Candidate]]:
+        """ Get information about the internal state without actually stepping forward in time """

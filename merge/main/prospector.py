@@ -1,6 +1,6 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional, List
 
 from merge.corpus import Corpus
 from merge.main.candidate import Candidate
@@ -49,10 +49,3 @@ class Prospector(ABC):
 
 class Dyci2Prospector(Prospector):
     pass
-
-
-class SomaxProspector(Prospector):
-    def set_time_axis(self):
-        pass
-        # TODO[B3]: THis function will be needed to pass which dimension (relative/absolute)
-        #           should be used for candidate handling in the continuous case

@@ -51,7 +51,7 @@ class Dyci2GenerationScheduler(GenerationScheduler):
     def __init__(self):
         super().__init__()
 
-    def process_query(self, query: Query, **kwargs) -> None:
+    def update_state(self, query: Query, **kwargs) -> None:
         pass
 
     def update_time(self, time: Time) -> List[Message]:
@@ -64,7 +64,7 @@ class SomaxGenerationScheduler(GenerationScheduler):
     def __init__(self):
         super().__init__()
 
-    def process_query(self, query: Query, **kwargs) -> None:
+    def update_state(self, query: Query, **kwargs) -> None:
         pass
 
     def update_time(self, time: Time) -> List[Message]:

@@ -71,7 +71,16 @@ class Candidates(ABC):
             factors: should either be
                 a scalar (float) or
                 an array of the same shape as the content returned from `get_candidates`, `get_scores`, etc. or
-                a list factors in combination with an index map"""
+                an array of factors (any shape) in combination with an index map (of same shape)
+            indices: can be either
+                an array of indices in combination with an array of factors (same shape)
+                a boolean mask of the same shape as the content returned from `get_candidates`, `get_scores`, etc.
+
+            The operation performed if `indices` are provided is equivalent to
+            ```
+                self.score[indices] *= factors
+            ```
+        """
 
 
 class BaseCandidates(Candidates):
