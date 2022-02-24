@@ -4,6 +4,7 @@ from typing import List, Type, Union, Optional
 import numpy as np
 
 from merge.main.candidate import Candidate
+from merge.main.exceptions import FeatureError
 from merge.main.feature import Feature
 from merge.stubs.transform import Transform
 
@@ -16,9 +17,8 @@ class Candidates(ABC):
     # def create_empty(cls, associated_corpus: Corpus, *args, **kwargs) -> 'Candidates':
     #     """ """
 
-    @classmethod
     @abstractmethod
-    def copy(cls, other) -> 'Candidates':
+    def shallow_copy(self) -> 'Candidates':
         """ :raises TypeError if trying to copy `Candidates` as an invalid type. """
 
     @abstractmethod
@@ -84,12 +84,68 @@ class Candidates(ABC):
 
 
 class BaseCandidates(Candidates):
-    pass
+    def __init__(self, candidates: List[Candidate]):
+        self._candidates: List[Candidate] = candidates
+
+    def shallow_copy(self) -> 'Candidates':
+        return BaseCandidates([c.shallow_copy() for c in self._candidates])
+
+    def add(self, candidates: List[Candidate], **kwargs) -> None:
+        self._candidates.extend(candidates)
+
+    def get_feature_array(self, feature: Union[Type[Feature], str]) -> np.ndarray:
+        try:
+            return np.array([c.event.get_feature(feature).value for c in self._candidates])
+        except KeyError as e:
+            raise FeatureError(e)
+
+    def get_candidate(self, index: int) -> Candidate:
+        return self._candidates[index]
+
+    def get_candidates(self) -> List[Candidate]:
+        return self._candidates
+
+    def get_scores(self) -> np.ndarray:
+        return np.array([c.score for c in self._candidates], dtype=np.int32)
+
+    def get_indices(self) -> np.ndarray:
+        return np.array([c.event.index for c in self._candidates], dtype=np.int32)
+
+    def get_transforms(self) -> List[Transform]:
+        return [c.transform for c in self._candidates]
+
+    def normalize(self, norm: float = 1.0) -> None:
+        scores: np.ndarray = np.array([c.score for c in self._candidates])
+        if scores.size > 0:
+            normalization_factor: float = norm / float(np.max(scores))
+            for c in self._candidates:
+                c.score *= normalization_factor
+
+    def remove(self, indices: Union[int, np.ndarray]) -> None:
+        if isinstance(indices, int):
+            del self._candidates[indices]
+        else:
+            for index in sorted(indices, reverse=True):
+                del self._candidates[index]
+
+    def is_empty(self) -> bool:
+        return len(self._candidates) == 0
+
+    def size(self) -> int:
+        return len(self._candidates)
+
+    def scale(self, factors: Union[float, np.ndarray], indices: Optional[np.ndarray] = None) -> None:
+        scores: np.ndarray = self.get_scores()
+        if indices is not None:
+            scores[indices] *= factors
+        else:
+            scores *= factors
+        for c, s in zip(self._candidates, scores):  # type: Candidate, float
+            c.score = s
 
 
 class DiscreteCandidates(Candidates):
-    pass # TODO: Implementation ongoing in somax.peaks
-
+    pass  # TODO: Implementation ongoing in somax.peaks
 
 
 class MatrixCandidates(Candidates):

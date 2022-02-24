@@ -23,6 +23,9 @@ class Query(Generic[T], ABC):
     def __len__(self) -> int:
         """ """
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(labels={self.content},time={self.time},path={self.path})"
+
 
 class TriggerQuery(Query[int], ABC):
     """ Integer `data` specifies number of events to trigger """
