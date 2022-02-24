@@ -14,7 +14,8 @@ from merge.main.query import Query
 
 class Generator(ABC):
     def __init__(self, merge_handler: MergeHandler, post_filters: List[PostFilter],
-                 jury: Jury, prospectors: Optional[List[Prospector]] = None):
+                 jury: Jury, prospectors: Optional[List[Prospector]] = None, **kwargs):
+        super().__init__(**kwargs)
         self.logger = logging.getLogger(__name__)
         self._merge_handler: MergeHandler = merge_handler
         self._post_filters: List[PostFilter] = post_filters  # TODO: Should be dict/component
@@ -37,8 +38,13 @@ class Generator(ABC):
     def _on_clear(self) -> None:
         """ """
 
+    @abstractmethod
+    def _on_read(self, corpus: Corpus, **kwargs) -> None:
+        """ """
+
     def read_memory(self, corpus: Corpus, **kwargs) -> None:
         # TODO: Handle multicorpus case: learning a corpus in only a particular Prospector => PathSpec argument
+        self._on_read(corpus, **kwargs)
         for prospector in self._prospectors:
             prospector.read_memory(corpus, **kwargs)
 
@@ -69,9 +75,6 @@ class Generator(ABC):
         for prospector in self._prospectors:
             prospector.feedback(event, **kwargs)
 
-
-class SomaxGenerator(Generator):
-    pass
 
 
 class Dyci2Generator(Generator):

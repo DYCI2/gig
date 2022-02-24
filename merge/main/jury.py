@@ -12,7 +12,7 @@ class Jury(ABC):
         """ """
 
     @abstractmethod
-    def feedback(self, candidates: Optional[Candidate], **kwargs) -> None:
+    def feedback(self, candidate: Optional[Candidate], **kwargs) -> None:
         """ """
 
     @abstractmethod

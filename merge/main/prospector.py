@@ -6,11 +6,12 @@ from merge.corpus import Corpus
 from merge.main.candidate import Candidate
 from merge.main.candidates import Candidates
 from merge.main.corpus_event import CorpusEvent
-from merge.main.influence import Influence
+from merge.main.query import Query
 
 
 class Prospector(ABC):
-    def __init__(self):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.logger = logging.getLogger(__name__)
 
     @abstractmethod
@@ -22,7 +23,7 @@ class Prospector(ABC):
         """ """
 
     @abstractmethod
-    def process(self, influence: Influence, **kwargs) -> None:
+    def process(self, query: Query, **kwargs) -> None:
         """ """
 
     @abstractmethod

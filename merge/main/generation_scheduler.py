@@ -14,7 +14,8 @@ from merge.stubs.time import Time
 class GenerationScheduler(ABC):
     """ """
 
-    def __init__(self, generator: Generator):
+    def __init__(self, generator: Generator, **kwargs):
+        super().__init__(**kwargs)
         self.logger = logging.getLogger(__name__)
         self.generator: Generator = generator
 
@@ -22,9 +23,9 @@ class GenerationScheduler(ABC):
     def process_query(self, query: Query, **kwargs) -> None:
         """ """
 
-    @abstractmethod
-    def update_time(self, time: Time) -> List[Message]:
-        """ """
+    # @abstractmethod
+    # def update_time(self, time: Time) -> List[Message]:
+    #     """ """
 
     def _on_feedback(self, event: Optional[Candidate], **kwargs) -> None:
         """ Override this function to implement manual behaviour on feedback """

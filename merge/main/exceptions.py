@@ -55,3 +55,12 @@ class FilterError(Exception):
 
     def __init__(self, err):
         super().__init__(err)
+
+
+class ConfigurationError(Exception):
+    """ Raised when a component of the architecture has an invalid configuration
+        (for example using a DYCI2Prospector in a SomaxGenerator)
+    """
+
+    def __init__(self, err):
+        super().__init__(err)

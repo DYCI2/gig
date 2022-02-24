@@ -1,2 +1,3 @@
-class PathSpec:
-    pass
+from typing import List
+
+PathSpec = List[str]
