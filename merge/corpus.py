@@ -56,6 +56,9 @@ class Corpus(Generic[E], ABC):
     def get_features_of_type(self, feature_type: Type[Feature]) -> List[Feature]:
         return [e.get_feature(feature_type) for e in self.events]
 
+    def get_content_type(self) -> Type[E]:
+        return self.__class__.__orig_bases__[0].__args__
+
 
 class FreeCorpus(Corpus[CorpusEvent]):
 

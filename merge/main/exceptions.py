@@ -64,3 +64,12 @@ class ConfigurationError(Exception):
 
     def __init__(self, err):
         super().__init__(err)
+
+
+class StateError(Exception):
+    """ Raised when an invalid state occurs in the runtime domain of the system, for example when
+        sending a `Query` before loading a corpus
+    """
+
+    def __init__(self, err):
+        super().__init__(err)

@@ -1,11 +1,9 @@
 import logging
 from abc import ABC, abstractmethod
-from typing import Optional, TypeVar, Generic, List
+from typing import Optional, TypeVar, Generic, List, Union
 
-from merge.main.corpus_event import CorpusEvent
 from merge.main.exceptions import QueryError
-from merge.main.feature import Feature
-from merge.main.label import Label
+from merge.main.influence import Influence
 from merge.stubs.pathspec import PathSpec
 from merge.stubs.time import Time
 
@@ -39,23 +37,30 @@ class TriggerQuery(Query[int], ABC):
         return self.content
 
 
-class InfluenceQuery(Generic[T], Query[List[T]]):
-    def __init__(self, content: List[T], time: Optional[Time] = None, path: Optional[PathSpec] = None):
+class InfluenceQuery(Query[List[Influence]]):
+    def __init__(self,
+                 content: Union[Influence, List[Influence]],
+                 time: Optional[Time] = None,
+                 path: Optional[PathSpec] = None):
         super().__init__(content, time, path)
-        if len(content) == 0:
-            raise QueryError(f"A {self.__class__.__name__} must contain at least one element")
+
+        if not isinstance(content, list):
+            self.content: List[Influence] = [content]
+        elif len(content) == 0:
+            raise QueryError(f"A {self.__class__.__name__} cannot be empty.")
+        else:
+            self.content: List[Influence] = content
 
     def __len__(self) -> int:
         return len(self.content)
 
-
-class FeatureQuery(InfluenceQuery[Feature]):
-    pass
-
-
-class LabelQuery(InfluenceQuery[Label]):
-    pass
-
-
-class CorpusQuery(InfluenceQuery[CorpusEvent]):
-    pass
+# class FeatureQuery(InfluenceQuery[Feature]):
+#     pass
+#
+#
+# class LabelQuery(InfluenceQuery[Label]):
+#     pass
+#
+#
+# class CorpusQuery(InfluenceQuery[CorpusEvent]):
+#     pass

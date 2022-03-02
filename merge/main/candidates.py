@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import List, Type, Union, Optional
+from typing import List, Type, Union, Optional, Set
 
 import numpy as np
 
+from merge.corpus import Corpus
 from merge.main.candidate import Candidate
 from merge.main.exceptions import FeatureError
 from merge.main.feature import Feature
@@ -50,6 +51,10 @@ class Candidates(ABC):
         """ """
 
     @abstractmethod
+    def associated_corpora(self) -> List[Corpus]:
+        """ """
+
+    @abstractmethod
     def normalize(self, norm: float = 1.0) -> None:
         """ """
 
@@ -84,14 +89,23 @@ class Candidates(ABC):
 
 
 class BaseCandidates(Candidates):
-    def __init__(self, candidates: List[Candidate]):
+    def __init__(self, candidates: List[Candidate], associated_corpus: Optional[Corpus] = None):
         self._candidates: List[Candidate] = candidates
+
+        self.corpora: Set[Corpus] = set()
+        if associated_corpus is None:
+            for candidate in self._candidates:
+                self.corpora.add(candidate.associated_corpus)
+        else:
+            self.corpora.add(associated_corpus)
 
     def shallow_copy(self) -> 'Candidates':
         return BaseCandidates([c.shallow_copy() for c in self._candidates])
 
     def add(self, candidates: List[Candidate], **kwargs) -> None:
         self._candidates.extend(candidates)
+        for candidate in candidates:
+            self.corpora.add(candidate.associated_corpus)
 
     def get_feature_array(self, feature: Union[Type[Feature], str]) -> np.ndarray:
         try:
@@ -113,6 +127,9 @@ class BaseCandidates(Candidates):
 
     def get_transforms(self) -> List[Transform]:
         return [c.transform for c in self._candidates]
+
+    def associated_corpora(self) -> List[Corpus]:
+        return list(self.associated_corpora())
 
     def normalize(self, norm: float = 1.0) -> None:
         scores: np.ndarray = np.array([c.score for c in self._candidates])

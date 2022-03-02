@@ -1,18 +1,14 @@
-import logging
 from abc import ABC, abstractmethod
-from typing import Optional, List
+from typing import Optional
 
 from merge.corpus import Corpus
 from merge.main.candidate import Candidate
 from merge.main.candidates import Candidates
 from merge.main.corpus_event import CorpusEvent
-from merge.main.query import Query
+from merge.main.influence import Influence
 
 
 class Prospector(ABC):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.logger = logging.getLogger(__name__)
 
     @abstractmethod
     def learn_event(self, event: CorpusEvent, **kwargs) -> None:
@@ -23,7 +19,7 @@ class Prospector(ABC):
         """ """
 
     @abstractmethod
-    def process(self, query: Query, **kwargs) -> None:
+    def process(self, influence: Influence, **kwargs) -> None:
         """ """
 
     @abstractmethod
@@ -36,8 +32,7 @@ class Prospector(ABC):
     @abstractmethod
     def pop_candidates(self, **kwargs) -> Candidates:
         """ TODO: Proper docstring
-            Note! Depending on implementation, may or may not remove or alter the candidates
-                  in the prospector's internal state. """
+            Get the candidates and (for most implementations) step forward in the Prospector's internal state. """
 
     @abstractmethod
     def clear(self) -> None:
@@ -46,7 +41,3 @@ class Prospector(ABC):
     @abstractmethod
     def feedback(self, event: Optional[Candidate], **kwargs) -> None:
         """ """
-
-
-class Dyci2Prospector(Prospector):
-    pass
