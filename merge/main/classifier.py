@@ -21,7 +21,7 @@ class Classifier(Generic[T], ABC):
 
     def classify_multiple(self, features: List[T]) -> List[Label]:
         """ Function that may be overridden for optimization reasons """
-        return [self.classify(feature.value) for feature in features]
+        return [self.classify(feature) for feature in features]
 
 
 class PreTrainable(ABC):

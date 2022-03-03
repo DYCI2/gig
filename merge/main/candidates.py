@@ -18,6 +18,9 @@ class Candidates(ABC):
     # def create_empty(cls, associated_corpus: Corpus, *args, **kwargs) -> 'Candidates':
     #     """ """
 
+    def __len__(self):
+        return self.size()
+
     @abstractmethod
     def shallow_copy(self) -> 'Candidates':
         """ :raises TypeError if trying to copy `Candidates` as an invalid type. """

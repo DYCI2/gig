@@ -1,6 +1,7 @@
+import numpy as np
 import logging
 from abc import ABC, abstractmethod
-from typing import List, Type, Optional, TypeVar, Generic
+from typing import List, Type, Optional, TypeVar, Generic, Set, Union
 
 from merge.main.corpus_event import CorpusEvent
 from merge.main.exceptions import CorpusError
@@ -47,14 +48,30 @@ class Corpus(Generic[E], ABC):
 
     @staticmethod
     def compute_feature_types(events: List[E]) -> List[Type[Feature]]:
-        raise NotImplemented("Not implemented")  # TODO[B6]
+        # TODO[B6]: Proper strategy to also handle strings with correct signatures
+        feature_types: Set[Type[Feature]] = set()
+        for event in events:    # type: CorpusEvent
+            for feature_type in event.features.keys():
+                feature_types.add(feature_type)
+
+        return list(feature_types)
 
     @staticmethod
     def compute_label_types(events: List[E]) -> List[Type[Label]]:
-        raise NotImplemented("Not implemented")  # TODO[B6]
+        # TODO[B6]: Proper strategy to also handle strings
+        label_types: Set[Type[Label]] = set()
+        for event in events:
+            for label_type in event.labels.keys():
+                label_types.add(label_type)
 
-    def get_features_of_type(self, feature_type: Type[Feature]) -> List[Feature]:
-        return [e.get_feature(feature_type) for e in self.events]
+        return list(label_types)
+
+    def get_features_of_type(self, feature_type: Type[Feature],
+                             as_array: bool = False) -> Union[List[Feature], np.ndarray]:
+        if as_array:
+            return np.array([e.get_feature(feature_type).value for e in self.events])
+        else:
+            return [e.get_feature(feature_type) for e in self.events]
 
     def get_content_type(self) -> Type[E]:
         return self.__class__.__orig_bases__[0].__args__

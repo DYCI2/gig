@@ -15,6 +15,9 @@ class Candidate:
         self.transform: Optional[Union[Transform, int]] = transform  # TODO[B2]: NoTransform if Optional
         self.associated_corpus: Corpus = associated_corpus
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(event={self.event},score={self.score},transform={self.transform},...)"
+
     @classmethod
     def new_default(cls, event: CorpusEvent, associated_corpus: Corpus) -> 'Candidate':
         return cls(event=event, score=1.0, transform=None, associated_corpus=associated_corpus)

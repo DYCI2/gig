@@ -23,14 +23,14 @@ class AbsoluteSchedulable:
 
 class CorpusEvent:
     def __init__(self, index: int,
-                 features: Dict[Union[str, Type[Feature]], Feature],
-                 labels: Dict[Union[str, Type[Label]], Label],
+                 features: Optional[Dict[Union[str, Type[Feature]], Feature]] = None,
+                 labels: Optional[Dict[Union[str, Type[Label]], Label]] = None,
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = logging.getLogger(__name__)
         self.index: int = index
-        self.features: Dict[Union[str, Type[Feature]], Feature] = features
-        self.labels: Dict[Union[str, Type[Label]], Label] = labels
+        self.features: Dict[Union[str, Type[Feature]], Feature] = features if features is not None else {}
+        self.labels: Dict[Union[str, Type[Label]], Label] = labels if labels is not None else {}
 
     def get_feature(self, feature_type: Union[str, Type[Feature]]) -> Optional[Feature]:
         return self.features.get(feature_type)
