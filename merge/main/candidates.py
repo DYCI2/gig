@@ -91,7 +91,7 @@ class Candidates(ABC):
         """
 
 
-class BaseCandidates(Candidates):
+class ListCandidates(Candidates):
     def __init__(self, candidates: List[Candidate], associated_corpus: Optional[Corpus] = None):
         self._candidates: List[Candidate] = candidates
 
@@ -103,7 +103,7 @@ class BaseCandidates(Candidates):
             self.corpora.add(associated_corpus)
 
     def shallow_copy(self) -> 'Candidates':
-        return BaseCandidates([c.shallow_copy() for c in self._candidates])
+        return ListCandidates([c.shallow_copy() for c in self._candidates])
 
     def add(self, candidates: List[Candidate], **kwargs) -> None:
         self._candidates.extend(candidates)

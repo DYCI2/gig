@@ -32,6 +32,9 @@ class CorpusEvent:
         self.features: Dict[Union[str, Type[Feature]], Feature] = features if features is not None else {}
         self.labels: Dict[Union[str, Type[Label]], Label] = labels if labels is not None else {}
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(index={self.index},...)"
+
     def get_feature(self, feature_type: Union[str, Type[Feature]]) -> Optional[Feature]:
         return self.features.get(feature_type)
 
