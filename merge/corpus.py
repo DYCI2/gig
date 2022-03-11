@@ -1,9 +1,10 @@
-import numpy as np
 import logging
 from abc import ABC, abstractmethod
 from typing import List, Type, Optional, TypeVar, Generic, Set, Union
 
-from merge.main.corpus_event import CorpusEvent
+import numpy as np
+
+from merge.main.corpus_event import CorpusEvent, GenericCorpusEvent, T
 from merge.main.exceptions import CorpusError
 from merge.main.feature import Feature
 from merge.main.label import Label
@@ -46,11 +47,15 @@ class Corpus(Generic[E], ABC):
     def append(self, event: E) -> None:
         """ """
 
+    @abstractmethod
+    def get_content_type(self) -> Type[E]:
+        """ """
+
     @staticmethod
     def compute_feature_types(events: List[E]) -> List[Type[Feature]]:
         # TODO[B6]: Proper strategy to also handle strings with correct signatures
         feature_types: Set[Type[Feature]] = set()
-        for event in events:    # type: CorpusEvent
+        for event in events:  # type: CorpusEvent
             for feature_type in event.features.keys():
                 feature_types.add(feature_type)
 
@@ -73,24 +78,29 @@ class Corpus(Generic[E], ABC):
         else:
             return [e.get_feature(feature_type) for e in self.events]
 
+
+class GenericCorpus(Corpus[GenericCorpusEvent[T]]):
+    def __init__(self,
+                 events: List[GenericCorpusEvent[T]],
+                 feature_types: Optional[List[Type[Feature]]] = None,
+                 label_types: Optional[List[Type[Label]]] = None):
+        super().__init__(events=events, feature_types=feature_types, label_types=label_types)
+
+    @classmethod
+    def build(cls, *args, **kwargs) -> 'GenericCorpus[T]':
+        raise NotImplemented("Not implemented")  # TODO[B6]
+
+    @classmethod
+    def load(cls, filepath: str, volatile: bool = False, **kwargs) -> 'GenericCorpus[T]':
+        raise NotImplemented("Not implemented")  # TODO[B6]
+
     def get_content_type(self) -> Type[E]:
-        return self.__class__.__orig_bases__[0].__args__
-
-
-class FreeCorpus(Corpus[CorpusEvent]):
-
-    @classmethod
-    def build(cls, *args, **kwargs) -> 'Corpus':
-        raise NotImplemented("Not implemented")  # TODO[B6]
-
-    @classmethod
-    def load(cls, filepath: str, volatile: bool = False, **kwargs) -> 'Corpus':
-        raise NotImplemented("Not implemented")  # TODO[B6]
+        return GenericCorpusEvent
 
     def export(self, filepath: str, overwrite: bool = False, **kwargs) -> None:
         raise NotImplemented("Not implemented")  # TODO[B6]
 
-    def append(self, event: E) -> None:
+    def append(self, event: GenericCorpusEvent[T]) -> None:
         for feature in event.features:
             if feature not in self.feature_types:
                 raise CorpusError(f"Feature {feature.__class__.__name__} does not exist in corpus {self}. "

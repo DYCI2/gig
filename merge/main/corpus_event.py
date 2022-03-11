@@ -1,9 +1,12 @@
 import logging
-from typing import Dict, Union, Type, List, Optional
+from typing import Dict, Union, Type, List, Optional, Generic, TypeVar
 
+from merge.main.exceptions import FeatureError, LabelError
 from merge.main.feature import Feature
 from merge.main.label import Label
 from merge.stubs.note import Note
+
+T = TypeVar('T')
 
 
 class RelativeSchedulable:
@@ -22,24 +25,45 @@ class AbsoluteSchedulable:
 
 
 class CorpusEvent:
-    def __init__(self, index: int,
+    def __init__(self,
+                 index: int,
                  features: Optional[Dict[Union[str, Type[Feature]], Feature]] = None,
                  labels: Optional[Dict[Union[str, Type[Label]], Label]] = None,
-                 *args, **kwargs):
-        super().__init__(*args, **kwargs)
+                 **kwargs):
+        super().__init__(**kwargs)
         self.logger = logging.getLogger(__name__)
         self.index: int = index
         self.features: Dict[Union[str, Type[Feature]], Feature] = features if features is not None else {}
         self.labels: Dict[Union[str, Type[Label]], Label] = labels if labels is not None else {}
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(index={self.index},...)"
+        if (len(self.features) == 1 and len(self.labels) == 0) or (len(self.features) == 0 and len(self.labels) == 1):
+            return f"{self.__class__.__name__}(index={self.index},features={self.features},labels={self.labels})"
+        else:
+            return f"{self.__class__.__name__}(index={self.index},features=...,labels=...)"
 
-    def get_feature(self, feature_type: Union[str, Type[Feature]]) -> Optional[Feature]:
-        return self.features.get(feature_type)
+    def get_feature(self, feature_type: Union[str, Type[Feature]]) -> Feature:
+        try:
+            return self.features[feature_type]
+        except KeyError as e:
+            raise FeatureError(f"Event '{str(self)}' does not have a feature of type '{feature_type.__name__}'") from e
 
     def get_label(self, label_type: Union[str, Type[Label]]) -> Optional[Label]:
-        return self.labels.get(label_type)
+        try:
+            return self.labels[label_type]
+        except KeyError as e:
+            raise FeatureError(f"Event '{str(self)}' does not have a label of type '{label_type.__name__}'") from e
+
+
+class GenericCorpusEvent(CorpusEvent, Generic[T]):
+    def __init__(self,
+                 data: T,
+                 index: int,
+                 features: Optional[Dict[Union[str, Type[Feature]], Feature]] = None,
+                 labels: Optional[Dict[Union[str, Type[Label]], Label]] = None,
+                 **kwargs):
+        super().__init__(index=index, features=features, labels=labels, **kwargs)
+        self.data: T = data
 
 
 class MidiEvent(CorpusEvent, RelativeSchedulable, AbsoluteSchedulable):

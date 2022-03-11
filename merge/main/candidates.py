@@ -132,7 +132,7 @@ class ListCandidates(Candidates):
         return [c.transform for c in self._candidates]
 
     def associated_corpora(self) -> List[Corpus]:
-        return list(self.associated_corpora())
+        return list(self.corpora)
 
     def normalize(self, norm: float = 1.0) -> None:
         scores: np.ndarray = np.array([c.score for c in self._candidates])
