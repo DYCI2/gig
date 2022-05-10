@@ -73,6 +73,11 @@ class ParameterError(Exception):
         super().__init__(err)
 
 
+class InputError(Exception):
+    """ Generic error for external input (generally over OSC) that cannot be handled and is not covered by any of the
+        other exceptions in this module """
+
+
 class StateError(Exception):
     """ Raised when an invalid state occurs in the runtime domain of the system, for example when
         sending a `Query` before loading a corpus
