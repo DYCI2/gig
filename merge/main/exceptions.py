@@ -66,6 +66,13 @@ class ConfigurationError(Exception):
         super().__init__(err)
 
 
+class ParameterError(Exception):
+    """ Raised when a Parameter receives a value of the wrong type or out of the for the Parameter specified range """
+
+    def __init__(self, err):
+        super().__init__(err)
+
+
 class StateError(Exception):
     """ Raised when an invalid state occurs in the runtime domain of the system, for example when
         sending a `Query` before loading a corpus
