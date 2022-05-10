@@ -1,6 +1,6 @@
 from typing import Optional, Union
 
-from merge.corpus import Corpus
+from merge.main.corpus import Corpus
 from merge.main.corpus_event import CorpusEvent
 from merge.stubs.transform import Transform
 

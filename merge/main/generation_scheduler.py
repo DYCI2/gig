@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from merge.corpus import Corpus
+from merge.main.corpus import Corpus
 from merge.main.corpus_event import CorpusEvent
 from merge.main.query import Query
 

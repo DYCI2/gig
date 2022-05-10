@@ -3,7 +3,7 @@ from typing import List, Type, Union, Optional, Set
 
 import numpy as np
 
-from merge.corpus import Corpus
+from merge.main.corpus import Corpus
 from merge.main.candidate import Candidate
 from merge.main.exceptions import FeatureError
 from merge.main.feature import Feature
