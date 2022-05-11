@@ -1,13 +1,14 @@
 import functools
 from typing import TypeVar, Generic, Optional, Callable, List
 
+from merge.io.addressable import Addressable
 from merge.io.param_utils import MaxType, ParameterRange
 from merge.main.exceptions import ParameterError, ConfigurationError
 
 T = TypeVar('T')
 
 
-class Parameter(Generic[T]):
+class Parameter(Generic[T], Addressable):
     """ Class for setting parameters that should be accessible over OSC.
 
         Note that the `on_parameter_change` can be used if updating the given parameter should change additional values
@@ -40,7 +41,7 @@ class Parameter(Generic[T]):
         def compose(f, g):
             return lambda x: f(g(x))
 
-        input_validation: List[Callable[[T], T]] = []
+        input_validation: List[Callable[[T], T]] = [lambda x: x]
         if check_range:
             if self.param_range is None:
                 raise ConfigurationError("no range specification was provided, checking range is not possible")
