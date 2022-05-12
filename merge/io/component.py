@@ -74,7 +74,7 @@ class Component(Addressable):
                 if self.search_dictionary_values:
                     addressables.extend(self._search_iterable(parent_names, item.values()))
 
-            elif self.search_lists and isinstance(item, collections.abc.Iterable):
+            elif self.search_lists and isinstance(item, collections.abc.Iterable) and not isinstance(item, str):
                 addressables.extend(self._search_iterable(parent_names, item))
 
         return addressables
