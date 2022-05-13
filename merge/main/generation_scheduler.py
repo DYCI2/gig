@@ -1,8 +1,11 @@
 from abc import ABC, abstractmethod
+from typing import List
 
 from merge.main.corpus import Corpus
 from merge.main.corpus_event import CorpusEvent
 from merge.main.query import Query
+from merge.stubs.rendering import Message
+from merge.stubs.timepoint import Timepoint
 
 
 class GenerationScheduler(ABC):
@@ -12,9 +15,9 @@ class GenerationScheduler(ABC):
     def process_query(self, query: Query, **kwargs) -> None:
         """ """
 
-    # @abstractmethod
-    # def update_time(self, time: Time) -> List[Message]:
-    #     """ """
+    @abstractmethod
+    def update_time(self, time: Timepoint) -> List[Message]:
+        """ """
 
     @abstractmethod
     def read_memory(self, corpus: Corpus, **kwargs) -> None:

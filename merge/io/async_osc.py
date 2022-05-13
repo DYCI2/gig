@@ -6,11 +6,13 @@ from abc import ABC, abstractmethod
 from logging import Logger
 from typing import Optional, Callable, List, Awaitable
 
-from maxosc import Sender, SendFormat
 from maxosc.caller import Caller
 from maxosc.maxformatter import MaxFormatter
 from pythonosc.dispatcher import Dispatcher
 from pythonosc.osc_server import AsyncIOOSCUDPServer
+
+from merge.io.osc_sender import OscSender
+from merge.stubs.rendering import Renderable
 
 
 class AsyncOsc(Caller, ABC):
@@ -23,7 +25,6 @@ class AsyncOsc(Caller, ABC):
                  ip: str,
                  default_address: str,
                  discard_duplicate_args: bool = False,
-                 osc_send_format: SendFormat = SendFormat.FLATTEN,
                  reraise_exceptions: bool = True,
                  *args, **kwargs):
         super().__init__(discard_duplicate_args=discard_duplicate_args, *args, **kwargs)
@@ -34,7 +35,7 @@ class AsyncOsc(Caller, ABC):
         self.default_address: str = default_address
         self.reraise_exceptions: bool = reraise_exceptions
 
-        self._sender: Sender = Sender(ip, send_port, send_format=osc_send_format)
+        self._sender: OscSender = OscSender(ip, send_port)
 
         self.server: Optional[AsyncIOOSCUDPServer] = None
 
@@ -71,6 +72,9 @@ class AsyncOsc(Caller, ABC):
         except OSError as e:
             self.logger.critical(f"{str(e)}. Could not run object")
             self.stop()
+        except KeyboardInterrupt:
+            self.logger.critical(f"Terminating due to keyboard interrupt (SIGINT)")
+            self.stop()
 
     def stop(self) -> None:
         self.__running = False
@@ -83,9 +87,12 @@ class AsyncOsc(Caller, ABC):
         else:
             raise RuntimeError("Cannot add async target while already running")
 
-    def send(self, *args, address: Optional[str] = None, send_format: Optional[SendFormat] = None) -> None:
+    def send(self, *args, address: Optional[str] = None) -> None:
         address = address if address is not None else self.default_address
-        self._sender.send(address, *args, send_format=send_format)
+        if len(args) == 1 and isinstance(args[0], Renderable):
+            self._sender.send_renderable(address, args[0])
+        else:
+            self._sender.send(address, *args)
 
     @property
     def running(self):
