@@ -3,15 +3,17 @@ import ipaddress
 import logging
 import multiprocessing
 from abc import ABC, abstractmethod
-from logging import Logger
-from typing import Optional, Callable, List, Awaitable
+from typing import Optional, Callable, List, Awaitable, Dict, Tuple
 
 from maxosc.caller import Caller
 from maxosc.maxformatter import MaxFormatter
 from pythonosc.dispatcher import Dispatcher
 from pythonosc.osc_server import AsyncIOOSCUDPServer
 
-from merge.io.osc_sender import OscSender
+from merge.io.component import Component
+from merge.io.osc_sender import OscSender, OscLogForwarder
+from merge.io.osc_status import Status
+from merge.main.exceptions import ConfigurationError, ComponentAddressError
 from merge.stubs.rendering import Renderable
 
 
@@ -26,9 +28,15 @@ class AsyncOsc(Caller, ABC):
                  default_address: str,
                  discard_duplicate_args: bool = False,
                  reraise_exceptions: bool = True,
+                 log_to_osc: bool = True,
+                 osc_log_address: Optional[str] = None,
+                 osc_log_level: int = logging.INFO,
                  *args, **kwargs):
-        super().__init__(discard_duplicate_args=discard_duplicate_args, *args, **kwargs)
+        super().__init__(parse_parenthesis_as_list=False,
+                         discard_duplicate_args=discard_duplicate_args,
+                         *args, **kwargs)
         self.logger = logging.getLogger(__name__)
+
         self.recv_port: int = recv_port
         self.send_port: int = send_port
         self.ip: str = ip
@@ -37,24 +45,22 @@ class AsyncOsc(Caller, ABC):
 
         self._sender: OscSender = OscSender(ip, send_port)
 
-        self.server: Optional[AsyncIOOSCUDPServer] = None
+        self.osc_log_handler: Optional[OscLogForwarder] = None
+        self.osc_log_address: Optional[str] = None
+        if log_to_osc:
+            self.osc_log_address = default_address if osc_log_address is None else osc_log_address
+            if not self.is_valid_osc_address(self.osc_log_address):
+                raise ConfigurationError(f"'{self.osc_log_address}' is not a valid OSC address")
+
+        self._server: Optional[AsyncIOOSCUDPServer] = None
 
         self._async_targets: List[Callable[[], Awaitable[None]]] = []
+
         self.__running: bool = False
 
     @abstractmethod
     async def _main_loop(self):
         """ Main loop function """
-
-    async def _run_until_terminated(self) -> None:
-        """ Dummy main loop to use for applications that do not need any async processing apart from OSC
-            To use:
-            >>> class MyServer(AsyncOsc):
-            >>>     async def _main_loop(self):
-            >>>         await self._run_until_terminated()
-            """
-        while self.running:
-            await asyncio.sleep(1.0)
 
     def start(self) -> None:
         """ Main function used to start the object. Function named for consistency with multiprocessing.Process """
@@ -70,7 +76,7 @@ class AsyncOsc(Caller, ABC):
         try:
             asyncio.run(self._run())
         except OSError as e:
-            self.logger.critical(f"{str(e)}. Could not run object")
+            self.logger.critical(f"{str(e)}. Couldn't start '{self.__class__.__name__}'")
             self.stop()
         except KeyboardInterrupt:
             self.logger.critical(f"Terminating due to keyboard interrupt (SIGINT)")
@@ -81,7 +87,7 @@ class AsyncOsc(Caller, ABC):
 
     def add_async_target(self, func: Callable[[], Awaitable[None]]) -> None:
         """ Add additional async functions to call continuously running. Each function needs their own loop
-        and should utilize `self.running` ideally. See `AsyncWithStatus` below """
+        and should utilize `self.running` ideally. """
         if not self.running:
             self._async_targets.append(func)
         else:
@@ -94,6 +100,12 @@ class AsyncOsc(Caller, ABC):
         else:
             self._sender.send(address, *args)
 
+    def set_log_level(self, logging_level: int):
+        if self.osc_log_handler is None:
+            raise ConfigurationError("object does not have OSC logging enabled")
+
+        self.osc_log_handler.set_log_level(logging_level=logging_level)
+
     @property
     def running(self):
         """ Note: Should be used to control main loop """
@@ -102,19 +114,25 @@ class AsyncOsc(Caller, ABC):
     async def _run(self) -> None:
         """ raises: OSError is server already is in use """
         self.__running = True
+
+        if self.osc_log_address:
+            self.osc_log_handler = OscLogForwarder(self._sender, self.osc_log_address)
+            self.logger.addHandler(self.osc_log_handler)
         osc_dispatcher: Dispatcher = Dispatcher()
-        osc_dispatcher.map(self.default_address, self.__process_osc)
+        # python-osc will regexp-replace '*' with '[^/]*?/*', resulting in matches between /some_address and
+        # /some_address2 even when the goal is to match only /some_address/some_child, hence the additional regex
+        osc_dispatcher.map(f"{self.default_address}($|/*)", self.__process_osc)
         osc_dispatcher.set_default_handler(self.__unmatched_osc)
-        self.server: AsyncIOOSCUDPServer = AsyncIOOSCUDPServer((self.ip, self.recv_port),
-                                                               osc_dispatcher, asyncio.get_event_loop())
-        transport, protocol = await self.server.create_serve_endpoint()
+        self._server: AsyncIOOSCUDPServer = AsyncIOOSCUDPServer((self.ip, self.recv_port),
+                                                                osc_dispatcher, asyncio.get_event_loop())
+        transport, protocol = await self._server.create_serve_endpoint()
         await asyncio.gather(self._main_loop(), *[f() for f in self._async_targets])
         transport.close()
 
-    def __process_osc(self, _address, *args):
+    def __process_osc(self, address: str, *args):
         args_str: str = MaxFormatter.format_as_string(*args)
         try:
-            self.call(args_str)
+            self.call(args_str, prepend_args=[address])
         except Exception as e:
             self.logger.error(e)
             self.logger.debug(repr(e))
@@ -122,17 +140,13 @@ class AsyncOsc(Caller, ABC):
                 raise
 
     def __unmatched_osc(self, address: str, *_args, **_kwargs) -> None:
-        self.logger.info(f"The address '{address}' does not exist.")
+        self.logger.warning(f"The address '{address}' does not exist.")
 
     @staticmethod
-    def parse_ip(ip: str, logger: Optional[Logger] = None) -> str:
-        try:
-            ipaddress.ip_address(ip)
-            return ip
-        except ValueError as e:
-            err = f"{str(e)}. Setting ip to {AsyncOsc.IP_LOCALHOST}."
-            logger.error(err)
-            return AsyncOsc.IP_LOCALHOST
+    def parse_ip(ip: str) -> str:
+        """ raises: ValuError if ip is invalid """
+        ipaddress.ip_address(ip)
+        return ip
 
     @staticmethod
     def path_to_osc_address(component_path: List[str]) -> str:
@@ -144,10 +158,102 @@ class AsyncOsc(Caller, ABC):
             return osc_address.split("/")[1:]
         return osc_address.split()
 
+    @staticmethod
+    def max_address_to_path(max_address: str) -> List[str]:
+        """ max address on the form `parent::child::{..}::parameter`"""
+        return max_address.split(sep="::")
 
+    @staticmethod
+    def is_valid_osc_address(osc_address: str) -> bool:
+        return osc_address.startswith("/")
+
+
+# TODO: Expand constructor to args of AsyncOsc once implementation has matured
 class AsyncOscMPC(AsyncOsc, multiprocessing.Process, ABC):
     def __init__(self, *args, **kwargs):
         # It's critical that multiprocessing.Process is initialized without any arguments
         # and that `AsyncOscWithStatus` is declared first in the __mro__
         AsyncOsc.__init__(self, *args, **kwargs)
+        multiprocessing.Process.__init__(self)
+
+
+class AsyncOscWithStatus(AsyncOsc, ABC):
+    STATUS_OSC_ADDRESS = "status"
+
+    def __init__(self,
+                 recv_port: int,
+                 send_port: int,
+                 ip: str,
+                 default_address: str,
+                 discard_duplicate_args: bool = False,
+                 reraise_exceptions: bool = True,
+                 status_interval_s: float = 0.5,
+                 *args, **kwargs):
+        super().__init__(recv_port=recv_port,
+                         send_port=send_port,
+                         ip=ip,
+                         default_address=default_address,
+                         discard_duplicate_args=discard_duplicate_args,
+                         reraise_exceptions=reraise_exceptions,
+                         *args, **kwargs)
+        self.status_interval_s: float = status_interval_s
+
+        self._map: Dict[str, Tuple[Component, str]] = {}
+        self.add_async_target(self.heartbeat_loop)
+
+    async def heartbeat_loop(self) -> None:
+        while self.running:
+            self.send_status_to_all(Status.READY)
+            await asyncio.sleep(self.status_interval_s)
+
+        self.send_status_to_all(Status.TERMINATED)
+
+    def register_osc_component(self,
+                               osc_address: str,
+                               osc_status_address: str,
+                               component: Component,
+                               override: bool = False) -> None:
+        """ raises: ComponentAddressError if component exists and override is False """
+        if osc_address in self._map and not override:
+            raise ComponentAddressError(f"A component ({self._map[osc_address][0].name}) is already "
+                                        f"registered for '{osc_address}'")
+
+        self._map[osc_address] = component, osc_status_address
+
+    def deregister_osc_component(self, osc_address: str) -> None:
+        if osc_address not in self._map:
+            raise ComponentAddressError(f"No component registered for '{osc_address}'")
+
+        del self._map[osc_address]
+        self.send_status(osc_address, Status.TERMINATED)
+
+    def send_status(self, status_address: str, status: Status) -> None:
+        self.send(status_address, status)
+
+    def send_status_to_all(self, status: Status) -> None:
+        for address in self.status_addresses:
+            self.send(address, status)
+
+    def component_at(self, osc_address: str) -> Component:
+        """ raises ComponentAddressError if component doesn't exist """
+        try:
+            return self._map[osc_address][0]
+        except KeyError:
+            raise ComponentAddressError(f"No component registered for '{osc_address}'")
+
+    @property
+    def addresses(self) -> List[str]:
+        return list(self._map.keys())
+
+    @property
+    def status_addresses(self) -> List[str]:
+        return [status_address for _, status_address in self._map.values()]
+
+
+# TODO: Expand constructor to args of AsyncOscWithStatus once implementation has matured
+class AsyncOscMPCWithStatus(AsyncOscWithStatus, multiprocessing.Process, ABC):
+    def __init__(self, *args, **kwargs):
+        # It's critical that multiprocessing.Process is initialized without any arguments
+        # and that `AsyncOscWithStatus` is declared first in the __mro__
+        AsyncOscWithStatus.__init__(self, *args, **kwargs)
         multiprocessing.Process.__init__(self)

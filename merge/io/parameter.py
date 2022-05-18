@@ -38,21 +38,14 @@ class Parameter(Generic[T], Addressable):
         self.description: Optional[str] = description
         self.on_parameter_change: Optional[Callable[[T], None]] = on_parameter_change
 
-        def compose(f, g):
-            return lambda x: f(g(x))
+        if check_range and self.param_range is None:
+            raise ConfigurationError("no range specification was provided, checking range is not possible")
 
-        input_validation: List[Callable[[T], T]] = [lambda x: x]
-        if check_range:
-            if self.param_range is None:
-                raise ConfigurationError("no range specification was provided, checking range is not possible")
-            input_validation.append(self._in_range)
+        if check_type and self.type_info is None:
+            raise ConfigurationError("no type specification was provided, checking type is not possible")
 
-        if check_type:
-            if self.type_info is None:
-                raise ConfigurationError("no type specification was provided, checking type is not possible")
-            input_validation.append(self._valid_type)
-
-        self.validate_input: Callable[[T], T] = functools.reduce(compose, input_validation)
+        self.check_range: bool = check_range
+        self.check_type: bool = check_type
 
     @property
     def value(self):
@@ -61,7 +54,12 @@ class Parameter(Generic[T], Addressable):
     @value.setter
     def value(self, value: T):
         """ raises: ParameterError if outside range or of invalid type, assuming range and/or type checks are enabled"""
-        self.validate_input(value)
+        if self.check_range:
+            self._in_range(value)
+
+        if self.check_type:
+            self._valid_type(value)
+
         self._value = value
         if self.on_parameter_change is not None:
             self.on_parameter_change(value)

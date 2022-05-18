@@ -29,7 +29,7 @@ class NominalRange(ParameterRange):
         return " ".join(self.labels)
 
 
-class OrdinalRange(ParameterRange):
+class NumericRange(ParameterRange):
     def __init__(self, lower_bound: Optional[T] = None, upper_bound: Optional[T] = None):
         self.lower_bound: Optional[T] = lower_bound
         self.upper_bound: Optional[T] = upper_bound
@@ -84,7 +84,7 @@ class MaxString(MaxType):
 class MaxBool(MaxType):
     @staticmethod
     def range() -> ParameterRange:
-        return OrdinalRange(0, 1)
+        return NumericRange(0, 1)
 
     def matches(self, value: Any):
         return isinstance(value, bool)

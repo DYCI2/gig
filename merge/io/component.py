@@ -14,7 +14,8 @@ class Component(Addressable):
         handled manually.
     """
 
-    def __init__(self, name: str,
+    def __init__(self,
+                 name: str,
                  search_lists: bool = False,
                  search_dictionary_keys: bool = False,
                  search_dictionary_values: bool = False,

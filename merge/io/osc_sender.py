@@ -25,3 +25,18 @@ class OscSender:
         elif isinstance(messages, collections.abc.Iterable):
             for message in messages:  # type: RendererMessage
                 self._client.send_message(address, *message.message)
+
+
+class OscLogForwarder(logging.Handler):
+
+    def __init__(self, sender: OscSender, osc_log_address: str, logging_level: int = logging.INFO):
+        super().__init__()
+        self.sender: OscSender = sender
+        self.osc_log_address: str = osc_log_address
+        self.setLevel(logging_level)
+
+    def emit(self, record):
+        self.sender.send(self.osc_log_address, record.levelname.lower(), self.format(record))
+
+    def set_log_level(self, logging_level: int):
+        self.setLevel(logging_level)

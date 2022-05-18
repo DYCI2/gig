@@ -66,6 +66,12 @@ class ConfigurationError(Exception):
         super().__init__(err)
 
 
+class ComponentAddressError(Exception):
+    """ Raised when a component address is invalid
+        (for example when an address is already taken or when addressing a non-existing component)
+    """
+
+
 class ParameterError(Exception):
     """ Raised when a Parameter receives a value of the wrong type or out of the for the Parameter specified range """
 

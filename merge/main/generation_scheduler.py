@@ -1,10 +1,9 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Any
 
 from merge.main.corpus import Corpus
 from merge.main.corpus_event import CorpusEvent
 from merge.main.query import Query
-from merge.stubs.rendering import Message
 from merge.stubs.timepoint import Timepoint
 
 
@@ -16,7 +15,7 @@ class GenerationScheduler(ABC):
         """ """
 
     @abstractmethod
-    def update_time(self, time: Timepoint) -> List[Message]:
+    def update_time(self, time: Timepoint) -> Any:
         """ """
 
     @abstractmethod
