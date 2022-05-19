@@ -6,6 +6,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Callable, List, Awaitable, Dict, Tuple
 
 from maxosc.caller import Caller
+from maxosc.exceptions import MaxOscError
 from maxosc.maxformatter import MaxFormatter
 from pythonosc.dispatcher import Dispatcher
 from pythonosc.osc_server import AsyncIOOSCUDPServer
@@ -27,10 +28,10 @@ class AsyncOsc(Caller, ABC):
                  ip: str,
                  default_address: str,
                  discard_duplicate_args: bool = False,
-                 reraise_exceptions: bool = True,
+                 reraise_runtime_exceptions: bool = True,
+                 capture_termination_exceptions: bool = True,
                  log_to_osc: bool = True,
                  osc_log_address: Optional[str] = None,
-                 osc_log_level: int = logging.INFO,
                  *args, **kwargs):
         super().__init__(parse_parenthesis_as_list=False,
                          discard_duplicate_args=discard_duplicate_args,
@@ -41,7 +42,8 @@ class AsyncOsc(Caller, ABC):
         self.send_port: int = send_port
         self.ip: str = ip
         self.default_address: str = default_address
-        self.reraise_exceptions: bool = reraise_exceptions
+        self.reraise_exceptions: bool = reraise_runtime_exceptions
+        self.capture_termination_exceptions: bool = capture_termination_exceptions
 
         self._sender: OscSender = OscSender(ip, send_port)
 
@@ -58,6 +60,11 @@ class AsyncOsc(Caller, ABC):
 
         self.__running: bool = False
 
+    @staticmethod
+    def default_log_config():
+        """ Call this at the beginning of _main_loop in each new multiprocessing.Process """
+        logging.basicConfig(level=logging.INFO, format='[%(levelname)s]: %(message)s')
+
     @abstractmethod
     async def _main_loop(self):
         """ Main loop function """
@@ -73,14 +80,18 @@ class AsyncOsc(Caller, ABC):
         """ Override this function if more complex error handling is needed.
             Again, function is named for compatibility with multiprocessing.Process
             Note: NEVER CALL THIS FUNCTION EXPLICITLY, ALWAYS CALL `start` """
-        try:
+        if not self.capture_termination_exceptions:
             asyncio.run(self._run())
-        except OSError as e:
-            self.logger.critical(f"{str(e)}. Couldn't start '{self.__class__.__name__}'")
-            self.stop()
-        except KeyboardInterrupt:
-            self.logger.critical(f"Terminating due to keyboard interrupt (SIGINT)")
-            self.stop()
+
+        else:
+            try:
+                asyncio.run(self._run())
+            except OSError as e:
+                self.logger.critical(f"{str(e)}. Couldn't start '{self.__class__.__name__}'")
+                self.stop()
+            except KeyboardInterrupt:
+                self.logger.critical(f"Terminating due to keyboard interrupt (SIGINT)")
+                self.stop()
 
     def stop(self) -> None:
         self.__running = False
@@ -133,6 +144,13 @@ class AsyncOsc(Caller, ABC):
         args_str: str = MaxFormatter.format_as_string(*args)
         try:
             self.call(args_str, prepend_args=[address])
+
+        # Called with wrong number of arguments, with duplicate arguments or calling function that doesn't exist
+        except (MaxOscError, TypeError) as e:
+            self.logger.error(e)
+            self.logger.debug(repr(e))
+
+        # Any other exception
         except Exception as e:
             self.logger.error(e)
             self.logger.debug(repr(e))
@@ -186,7 +204,8 @@ class AsyncOscWithStatus(AsyncOsc, ABC):
                  ip: str,
                  default_address: str,
                  discard_duplicate_args: bool = False,
-                 reraise_exceptions: bool = True,
+                 reraise_runtime_exceptions: bool = True,
+                 capture_termination_exceptions: bool = True,
                  status_interval_s: float = 0.5,
                  *args, **kwargs):
         super().__init__(recv_port=recv_port,
@@ -194,7 +213,8 @@ class AsyncOscWithStatus(AsyncOsc, ABC):
                          ip=ip,
                          default_address=default_address,
                          discard_duplicate_args=discard_duplicate_args,
-                         reraise_exceptions=reraise_exceptions,
+                         reraise_runtime_exceptions=reraise_runtime_exceptions,
+                         capture_termination_exceptions=capture_termination_exceptions,
                          *args, **kwargs)
         self.status_interval_s: float = status_interval_s
 
@@ -206,6 +226,7 @@ class AsyncOscWithStatus(AsyncOsc, ABC):
             self.send_status_to_all(Status.READY)
             await asyncio.sleep(self.status_interval_s)
 
+        # When correctly terminated, send termination status
         self.send_status_to_all(Status.TERMINATED)
 
     def register_osc_component(self,
@@ -228,11 +249,11 @@ class AsyncOscWithStatus(AsyncOsc, ABC):
         self.send_status(osc_address, Status.TERMINATED)
 
     def send_status(self, status_address: str, status: Status) -> None:
-        self.send(status_address, status)
+        self.send(status, address=status_address)
 
     def send_status_to_all(self, status: Status) -> None:
         for address in self.status_addresses:
-            self.send(address, status)
+            self.send_status(address, status)
 
     def component_at(self, osc_address: str) -> Component:
         """ raises ComponentAddressError if component doesn't exist """
