@@ -2,7 +2,7 @@ from abc import ABC
 from typing import TypeVar, Generic
 
 from merge.main.corpus_event import CorpusEvent
-from merge.main.feature import Feature
+from merge.main.descriptor import Descriptor
 from merge.main.label import Label
 
 T = TypeVar('T')
@@ -25,7 +25,7 @@ class CorpusInfluence(Influence[CorpusEvent]):
     pass
 
 
-class FeatureInfluence(Influence[Feature]):
+class FeatureInfluence(Influence[Descriptor]):
     """ Class to trigger incrementation of state based on a `Feature` """
     pass
 

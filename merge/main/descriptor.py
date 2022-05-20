@@ -8,7 +8,7 @@ from merge.main.exceptions import FeatureError
 T = TypeVar('T')
 
 
-class Feature(Generic[T], ABC):
+class Descriptor(Generic[T], ABC):
     def __init__(self, value: T):
         self.value: T = value
 
@@ -24,15 +24,15 @@ class Feature(Generic[T], ABC):
     #     """ """
 
 
-class IntegralFeature(Feature[int], ABC):
+class IntegralDescriptor(Descriptor[int], ABC):
     pass
 
 
-class FloatingFeature(Feature[float], ABC):
+class FloatingDescriptor(Descriptor[float], ABC):
     pass
 
 
-class VectorialFeature(Feature[np.ndarray], ABC):
+class VectorialDescriptor(Descriptor[np.ndarray], ABC):
     """ Feature class for (1d) vectors """
 
     def __init__(self, value: np.ndarray):
@@ -41,7 +41,7 @@ class VectorialFeature(Feature[np.ndarray], ABC):
             raise FeatureError(f"{self.__class__.__name__} only supports one-dimensional vectors")
 
 
-class FixedVectorialFeature(VectorialFeature, ABC):
+class FixedVectorialFeature(VectorialDescriptor, ABC):
     """ Feature class for (1d) vectors with a fixed feature size (for example 12-dimensional chroma, etc.) """
 
     def __init__(self, value: np.ndarray, size: int):
@@ -51,7 +51,7 @@ class FixedVectorialFeature(VectorialFeature, ABC):
                                f"Actual size was {value.size}")
 
 
-class IntegralPitch(IntegralFeature, ABC):
+class IntegralPitch(IntegralDescriptor, ABC):
     pass
 
 

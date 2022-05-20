@@ -6,7 +6,7 @@ import numpy as np
 
 from merge.main.corpus_event import CorpusEvent, GenericCorpusEvent, T
 from merge.main.exceptions import CorpusError
-from merge.main.feature import Feature
+from merge.main.descriptor import Descriptor
 from merge.main.label import Label
 
 E = TypeVar('E', bound=CorpusEvent)
@@ -14,12 +14,12 @@ E = TypeVar('E', bound=CorpusEvent)
 
 class Corpus(Generic[E], ABC):
     def __init__(self, events: List[E],
-                 feature_types: Optional[List[Type[Feature]]] = None,
+                 feature_types: Optional[List[Type[Descriptor]]] = None,
                  label_types: Optional[List[Type[Label]]] = None):
         # TODO[B4]: handle feature types (if not provided, gather all from events. Also: pre-compute feature values
         self.logger = logging.getLogger(__name__)
         self.events: List[E] = events
-        self.feature_types: List[Type[Feature]] = (feature_types if feature_types is not None
+        self.feature_types: List[Type[Descriptor]] = (feature_types if feature_types is not None
                                                    else self.compute_feature_types(events))
         self.label_types: List[Type[Label]] = (label_types if label_types is not None
                                                else self.compute_label_types(events))
@@ -52,9 +52,9 @@ class Corpus(Generic[E], ABC):
         """ """
 
     @staticmethod
-    def compute_feature_types(events: List[E]) -> List[Type[Feature]]:
+    def compute_feature_types(events: List[E]) -> List[Type[Descriptor]]:
         # TODO[B6]: Proper strategy to also handle strings with correct signatures
-        feature_types: Set[Type[Feature]] = set()
+        feature_types: Set[Type[Descriptor]] = set()
         for event in events:  # type: CorpusEvent
             for feature_type in event.features.keys():
                 feature_types.add(feature_type)
@@ -71,8 +71,8 @@ class Corpus(Generic[E], ABC):
 
         return list(label_types)
 
-    def get_features_of_type(self, feature_type: Type[Feature],
-                             as_array: bool = False) -> Union[List[Feature], np.ndarray]:
+    def get_features_of_type(self, feature_type: Type[Descriptor],
+                             as_array: bool = False) -> Union[List[Descriptor], np.ndarray]:
         if as_array:
             return np.array([e.get_feature(feature_type).value for e in self.events])
         else:
@@ -82,7 +82,7 @@ class Corpus(Generic[E], ABC):
 class GenericCorpus(Corpus[GenericCorpusEvent[T]]):
     def __init__(self,
                  events: List[GenericCorpusEvent[T]],
-                 feature_types: Optional[List[Type[Feature]]] = None,
+                 feature_types: Optional[List[Type[Descriptor]]] = None,
                  label_types: Optional[List[Type[Label]]] = None):
         super().__init__(events=events, feature_types=feature_types, label_types=label_types)
 

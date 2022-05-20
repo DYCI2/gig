@@ -6,7 +6,7 @@ import numpy as np
 from merge.main.corpus import Corpus
 from merge.main.candidate import Candidate
 from merge.main.exceptions import FeatureError
-from merge.main.feature import Feature
+from merge.main.descriptor import Descriptor
 from merge.stubs.transform import Transform
 
 
@@ -30,7 +30,7 @@ class Candidates(ABC):
         """ :raises CorpusError if adding candidates that violate Corpus constraints of Candidates subclasses """
 
     @abstractmethod
-    def get_feature_array(self, feature: Union[Type[Feature], str]) -> np.ndarray:
+    def get_feature_array(self, feature: Union[Type[Descriptor], str]) -> np.ndarray:
         """ """
 
     @abstractmethod
@@ -110,7 +110,7 @@ class ListCandidates(Candidates):
         for candidate in candidates:
             self.corpora.add(candidate.associated_corpus)
 
-    def get_feature_array(self, feature: Union[Type[Feature], str]) -> np.ndarray:
+    def get_feature_array(self, feature: Union[Type[Descriptor], str]) -> np.ndarray:
         try:
             return np.array([c.event.get_feature(feature).value for c in self._candidates])
         except KeyError as e:

@@ -1,13 +1,14 @@
 from abc import ABC, abstractmethod
 from typing import List, TypeVar, Generic
 
-from merge.main.feature import Feature, IntegralFeature, IntegralPitch
+from merge.io.parsable import Parsable
+from merge.main.descriptor import Descriptor, IntegralDescriptor, IntegralPitch
 from merge.main.label import Label, IntLabel
 
-T = TypeVar('T', bound=Feature)
+T = TypeVar('T', bound=Descriptor)
 
 
-class Classifier(Generic[T], ABC):
+class Classifier(Generic[T], Parsable['Classifier'], ABC):
 
     @abstractmethod
     def classify(self, feature: T) -> Label:
@@ -38,13 +39,13 @@ class Trainable(ABC):
     """ Interface for Classifiers that requires some sort of clustering to be performed on data from the corpus. """
 
     @abstractmethod
-    def cluster(self, features: List[Feature], *args, **kwargs) -> None:
+    def cluster(self, features: List[Descriptor], *args, **kwargs) -> None:
         """ """
 
 
-class IdentityClassifier(Classifier[IntegralFeature]):
+class IdentityClassifier(Classifier[IntegralDescriptor]):
 
-    def classify(self, feature: IntegralFeature) -> Label:
+    def classify(self, feature: IntegralDescriptor) -> Label:
         return IntLabel(feature.value)
 
     def clear(self) -> None:

@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Union
 
-from merge.main.feature import Feature
+from merge.main.descriptor import Descriptor
 from merge.main.label import Label
 
 
@@ -13,11 +13,11 @@ class Transform(ABC):
         """ """
 
     @abstractmethod
-    def apply(self, obj: Union[Label, Feature]) -> Union[Label, Feature]:
+    def apply(self, obj: Union[Label, Descriptor]) -> Union[Label, Descriptor]:
         """ """
 
     @abstractmethod
-    def inverse(self, obj: Union[Label, Feature]) -> Union[Label, Feature]:
+    def inverse(self, obj: Union[Label, Descriptor]) -> Union[Label, Descriptor]:
         """ """
 
     @abstractmethod

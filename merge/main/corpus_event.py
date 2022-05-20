@@ -2,7 +2,7 @@ import logging
 from typing import Dict, Union, Type, List, Optional, Generic, TypeVar
 
 from merge.main.exceptions import FeatureError, LabelError
-from merge.main.feature import Feature
+from merge.main.descriptor import Descriptor
 from merge.main.label import Label
 from merge.stubs.note import Note
 
@@ -27,13 +27,13 @@ class AbsoluteSchedulable:
 class CorpusEvent:
     def __init__(self,
                  index: int,
-                 features: Optional[Dict[Union[str, Type[Feature]], Feature]] = None,
+                 features: Optional[Dict[Union[str, Type[Descriptor]], Descriptor]] = None,
                  labels: Optional[Dict[Union[str, Type[Label]], Label]] = None,
                  **kwargs):
         super().__init__(**kwargs)
         self.logger = logging.getLogger(__name__)
         self.index: int = index
-        self.features: Dict[Union[str, Type[Feature]], Feature] = features if features is not None else {}
+        self.features: Dict[Union[str, Type[Descriptor]], Descriptor] = features if features is not None else {}
         self.labels: Dict[Union[str, Type[Label]], Label] = labels if labels is not None else {}
 
     def __repr__(self):
@@ -42,7 +42,7 @@ class CorpusEvent:
         else:
             return f"{self.__class__.__name__}(index={self.index},features=...,labels=...)"
 
-    def get_feature(self, feature_type: Union[str, Type[Feature]]) -> Feature:
+    def get_feature(self, feature_type: Union[str, Type[Descriptor]]) -> Descriptor:
         try:
             return self.features[feature_type]
         except KeyError as e:
@@ -59,7 +59,7 @@ class GenericCorpusEvent(CorpusEvent, Generic[T]):
     def __init__(self,
                  data: T,
                  index: int,
-                 features: Optional[Dict[Union[str, Type[Feature]], Feature]] = None,
+                 features: Optional[Dict[Union[str, Type[Descriptor]], Descriptor]] = None,
                  labels: Optional[Dict[Union[str, Type[Label]], Label]] = None,
                  **kwargs):
         super().__init__(index=index, features=features, labels=labels, **kwargs)
@@ -68,7 +68,7 @@ class GenericCorpusEvent(CorpusEvent, Generic[T]):
 
 class MidiEvent(CorpusEvent, RelativeSchedulable, AbsoluteSchedulable):
     def __init__(self, index: int,
-                 features: Dict[Union[str, Type[Feature]], Feature],
+                 features: Dict[Union[str, Type[Descriptor]], Descriptor],
                  labels: Dict[Union[str, Type[Label]], Label],
                  relative_onset: float, relative_duration: float, tempo: float,
                  absolute_onset: float, absolute_duration: float,
@@ -81,7 +81,7 @@ class MidiEvent(CorpusEvent, RelativeSchedulable, AbsoluteSchedulable):
 
 class AudioEvent(CorpusEvent, AbsoluteSchedulable):
     def __init__(self, index: int,
-                 features: Dict[Union[str, Type[Feature]], Feature],
+                 features: Dict[Union[str, Type[Descriptor]], Descriptor],
                  labels: Dict[Union[str, Type[Label]], Label],
                  absolute_onset: float, absolute_duration: float):
         super().__init__(index=index, features=features, labels=labels,
@@ -90,7 +90,7 @@ class AudioEvent(CorpusEvent, AbsoluteSchedulable):
 
 class BeatAudioEvent(AudioEvent, RelativeSchedulable):
     def __init__(self, index: int,
-                 features: Dict[Union[str, Type[Feature]], Feature],
+                 features: Dict[Union[str, Type[Descriptor]], Descriptor],
                  labels: Dict[Union[str, Type[Label]], Label],
                  relative_onset: float, relative_duration: float, tempo: float,
                  absolute_onset: float, absolute_duration: float):

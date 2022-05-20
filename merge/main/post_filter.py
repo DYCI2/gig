@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
+from merge.io.parsable import Parsable
 from merge.main.candidate import Candidate
 from merge.main.candidates import Candidates
 
 
-class PostFilter(ABC):
+class PostFilter(Parsable, ABC):
 
     @abstractmethod
     def filter(self, candidates: Candidates) -> Candidates:
