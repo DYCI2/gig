@@ -18,7 +18,7 @@ class Introspective:
             raises: ConfigurationError if multiple classes with the same name exists """
         if modules is None:
             modules: List[ModuleType] = [sys.modules[base_class.__module__]]
-        if modules is not None:
+        else:
             modules: List[ModuleType] = [modules] if not isinstance(modules, collections.abc.Iterable) else modules
 
         all_classes: List[Dict[str, T]] = []
