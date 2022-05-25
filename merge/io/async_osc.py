@@ -146,7 +146,7 @@ class AsyncOsc(Caller, ABC):
             self.call(args_str, prepend_args=[address])
 
         # Called with wrong number of arguments, with duplicate arguments or calling function that doesn't exist
-        except (MaxOscError, TypeError) as e:
+        except MaxOscError as e:
             self.logger.error(e)
             self.logger.debug(repr(e))
 
