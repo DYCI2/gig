@@ -62,7 +62,7 @@ class MaxInt(MaxType):
         return isinstance(value, int)
 
     def renderer_info(self) -> str:
-        return "i"
+        return "int"
 
 
 class MaxFloat(MaxType):
@@ -70,7 +70,7 @@ class MaxFloat(MaxType):
         return isinstance(value, float)
 
     def renderer_info(self) -> str:
-        return "f"
+        return "float"
 
 
 class MaxString(MaxType):
@@ -78,7 +78,7 @@ class MaxString(MaxType):
         return isinstance(value, str)
 
     def renderer_info(self) -> str:
-        return "s"
+        return "str"
 
 
 class MaxBool(MaxType):
@@ -98,7 +98,7 @@ class MaxList(MaxType):
         return isinstance(value, (list, np.ndarray))
 
     def renderer_info(self) -> str:
-        return "l"
+        return "list"
 
 
 class MaxListSized(MaxType):
@@ -109,7 +109,7 @@ class MaxListSized(MaxType):
         return isinstance(value, (list, np.ndarray)) and len(value) == self.size
 
     def renderer_info(self) -> str:
-        return f"l[{self.size}]"
+        return f"list[{self.size}]"
 
 
 class MaxCustom(MaxType):

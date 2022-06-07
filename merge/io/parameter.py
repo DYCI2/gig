@@ -1,5 +1,4 @@
-import functools
-from typing import TypeVar, Generic, Optional, Callable, List
+from typing import TypeVar, Generic, Optional, Callable, List, Union
 
 from merge.io.addressable import Addressable
 from merge.io.param_utils import MaxType, ParameterRange
@@ -33,6 +32,7 @@ class Parameter(Generic[T], Addressable):
                  on_parameter_change: Optional[Callable[[T], None]] = None):
         self.name = name
         self._value: T = default_value
+        self._default_value: T = default_value  # Only used to inform renderer about defaults
         self.type_info: Optional[MaxType] = type_info
         self.param_range: Optional[ParameterRange] = param_range
         self.description: Optional[str] = description
@@ -73,3 +73,18 @@ class Parameter(Generic[T], Addressable):
         if not self.type_info.matches(value):
             raise ParameterError(f"value {value} does not match type '{self.type_info.renderer_info()}'")
         return value
+
+    def renderer_info(self) -> List[Union[int, float, str]]:
+        info: List[Union[int, float, str]] = [self.name,
+                                              self.value,
+                                              self._default_value]
+        if self.type_info is not None:
+            info.append(self.type_info.renderer_info())
+
+        if self.param_range is not None:
+            info.append(self.param_range.renderer_info())
+
+        if self.description is not None:
+            info.append(self.description)
+
+        return info

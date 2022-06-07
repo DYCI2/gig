@@ -49,6 +49,7 @@ class AsyncOsc(Caller, ABC):
 
         self.osc_log_handler: Optional[OscLogForwarder] = None
         self.osc_log_address: Optional[str] = None
+
         if log_to_osc:
             self.osc_log_address = default_address if osc_log_address is None else osc_log_address
             if not self.is_valid_osc_address(self.osc_log_address):
@@ -171,6 +172,10 @@ class AsyncOsc(Caller, ABC):
         return "/" + "/".join(component_path)
 
     @staticmethod
+    def path_to_max_address(component_path: List[str]) -> str:
+        return "::".join(component_path)
+
+    @staticmethod
     def osc_address_to_path(osc_address: str) -> List[str]:
         if osc_address.startswith("/"):
             return osc_address.split("/")[1:]
@@ -242,6 +247,7 @@ class AsyncOscWithStatus(AsyncOsc, ABC):
         self._map[osc_address] = component, osc_status_address
 
     def deregister_osc_component(self, osc_address: str) -> None:
+        """ raises: ComponentAddressError """
         if osc_address not in self._map:
             raise ComponentAddressError(f"No component registered for '{osc_address}'")
 
