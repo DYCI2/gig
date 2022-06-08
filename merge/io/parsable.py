@@ -20,6 +20,11 @@ class Parsable(Generic[T]):
         except KeyError:
             raise InputError(f"No class named '{class_name}' exists in '{cls.__name__}'")
 
+    @classmethod
+    def to_string(cls) -> str:
+        """ returns class name in a max-compatible format """
+        return cls.__name__.lower()
+
 
 class ParsableWithDefault(Parsable[T], ABC):
     """ Similar to `Parsable` but returns a type defined in `default()` if no value is provided (empty string)"""

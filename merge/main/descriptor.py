@@ -23,6 +23,10 @@ class Descriptor(Generic[T], ABC):
     # def from_raw(cls, *args, **kwargs) -> List['Feature']:
     #     """ """
 
+    @classmethod
+    def to_string(cls) -> str:
+        return cls.__name__.lower()
+
 
 class IntegralDescriptor(Descriptor[int], ABC):
     pass
