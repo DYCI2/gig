@@ -17,8 +17,8 @@ class Parameter(Generic[T], Addressable):
         >>>         self.a: float
         >>>         self.b: Parameter[int] = Parameter("b", 0, on_parameter_change=self.calculate_a)
         >>>
-        >>>     def calculate_a(self, b):
-        >>>         self.a = b / 2
+        >>>     def calculate_a(self):
+        >>>         self.a = self.b.value / 2
     """
 
     def __init__(self,
@@ -29,14 +29,14 @@ class Parameter(Generic[T], Addressable):
                  description: Optional[str] = None,
                  check_range: bool = False,
                  check_type: bool = False,
-                 on_parameter_change: Optional[Callable[[T], None]] = None):
+                 on_parameter_change: Optional[Callable[[], None]] = None):
         self.name = name
         self._value: T = default_value
         self._default_value: T = default_value  # Only used to inform renderer about defaults
         self.type_info: Optional[MaxType] = type_info
         self.param_range: Optional[ParameterRange] = param_range
         self.description: Optional[str] = description
-        self.on_parameter_change: Optional[Callable[[T], None]] = on_parameter_change
+        self.on_parameter_change: Optional[Callable[[], None]] = on_parameter_change
 
         if check_range and self.param_range is None:
             raise ConfigurationError("no range specification was provided, checking range is not possible")
@@ -62,7 +62,7 @@ class Parameter(Generic[T], Addressable):
 
         self._value = value
         if self.on_parameter_change is not None:
-            self.on_parameter_change(value)
+            self.on_parameter_change()
 
     def _in_range(self, value: T) -> T:
         if value not in self.param_range:
