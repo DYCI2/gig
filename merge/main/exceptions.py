@@ -15,7 +15,7 @@ class ClassificationError(Exception):
         super().__init__(err)
 
 
-class FeatureError(Exception):
+class DescriptorError(Exception):
 
     def __init__(self, err):
         super().__init__(err)

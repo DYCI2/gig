@@ -1,17 +1,16 @@
 from abc import ABC, abstractmethod
-from typing import List, TypeVar, Generic
+from typing import List, Optional
 
 from merge.io.parsable import Parsable
-from merge.main.descriptor import Descriptor, IntegralDescriptor, IntegralPitch
+from merge.main.descriptor import Descriptor, IntegralDescriptor, MidiPitch
+from merge.main.exceptions import ClassificationError
 from merge.main.label import Label, IntLabel
 
-T = TypeVar('T', bound=Descriptor)
 
-
-class Classifier(Generic[T], Parsable['Classifier'], ABC):
+class Classifier(Parsable['Classifier'], ABC):
 
     @abstractmethod
-    def classify(self, feature: T) -> Label:
+    def classify(self, descriptor: Descriptor) -> Label:
         """ """
 
     @abstractmethod
@@ -20,42 +19,38 @@ class Classifier(Generic[T], Parsable['Classifier'], ABC):
             unloading its corpus. If the classifier is stateless, leave this method blank."""
         pass
 
-    def classify_multiple(self, features: List[T]) -> List[Label]:
+    def classify_multiple(self, descriptors: List[Descriptor]) -> List[Label]:
         """ Function that may be overridden for optimization reasons """
-        return [self.classify(feature) for feature in features]
-
-
-class PreTrainable(ABC):
-    """ Interface for Classifiers that requires some sort of clustering to be performed without access to any corpus.
-        An example of this would be a classifier that loads an external set of data and computers a clustering,
-        with or without additional parameters provided by the user"""
-
-    @abstractmethod
-    def cluster(self, *args, **kwargs) -> None:
-        """ """
+        return [self.classify(descriptor) for descriptor in descriptors]
 
 
 class Trainable(ABC):
     """ Interface for Classifiers that requires some sort of clustering to be performed on data from the corpus. """
 
     @abstractmethod
-    def cluster(self, features: List[Descriptor], *args, **kwargs) -> None:
+    def cluster(self, descriptors: Optional[List[Descriptor]] = None, *args, **kwargs) -> None:
         """ """
 
 
-class IdentityClassifier(Classifier[IntegralDescriptor]):
+class IdentityClassifier(Classifier):
 
-    def classify(self, feature: IntegralDescriptor) -> Label:
-        return IntLabel(feature.value)
+    def classify(self, descriptor: Descriptor) -> Label:
+        if not IntegralDescriptor:
+            raise ClassificationError(f"{self.__class__.__name__} can only handle integral values")
+
+        return IntLabel(descriptor.value)
 
     def clear(self) -> None:
         pass
 
 
-class PitchClassClassifier(Classifier[IntegralPitch]):
+class PitchClassClassifier(Classifier):
 
-    def classify(self, feature: IntegralPitch) -> Label:
-        return IntLabel(feature.value % 12)
+    def classify(self, descriptor: Descriptor) -> Label:
+        if not isinstance(descriptor, MidiPitch):
+            raise ClassificationError(f"{self.__class__.__name__} can only handle integral pitch descriptors")
+
+        return IntLabel(descriptor.value % 12)
 
     def clear(self) -> None:
         pass

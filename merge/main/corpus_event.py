@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, Union, Type, List, Optional, Generic, TypeVar
 
-from merge.main.exceptions import FeatureError, LabelError
+from merge.main.exceptions import DescriptorError, LabelError
 from merge.main.descriptor import Descriptor
 from merge.main.label import Label
 from merge.stubs.note import Note
@@ -46,13 +46,13 @@ class CorpusEvent:
         try:
             return self.features[feature_type]
         except KeyError as e:
-            raise FeatureError(f"Event '{str(self)}' does not have a feature of type '{feature_type.__name__}'") from e
+            raise DescriptorError(f"Event '{str(self)}' does not have a feature of type '{feature_type.__name__}'") from e
 
     def get_label(self, label_type: Union[str, Type[Label]]) -> Optional[Label]:
         try:
             return self.labels[label_type]
         except KeyError as e:
-            raise FeatureError(f"Event '{str(self)}' does not have a label of type '{label_type.__name__}'") from e
+            raise DescriptorError(f"Event '{str(self)}' does not have a label of type '{label_type.__name__}'") from e
 
 
 class GenericCorpusEvent(CorpusEvent, Generic[T]):

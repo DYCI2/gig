@@ -5,7 +5,7 @@ import numpy as np
 
 from merge.main.corpus import Corpus
 from merge.main.candidate import Candidate
-from merge.main.exceptions import FeatureError
+from merge.main.exceptions import DescriptorError
 from merge.main.descriptor import Descriptor
 from merge.stubs.transform import Transform
 
@@ -114,7 +114,7 @@ class ListCandidates(Candidates):
         try:
             return np.array([c.event.get_feature(feature).value for c in self._candidates])
         except KeyError as e:
-            raise FeatureError(e)
+            raise DescriptorError(e)
 
     def get_candidate(self, index: int) -> Candidate:
         return self._candidates[index]
