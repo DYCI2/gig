@@ -112,7 +112,7 @@ class ListCandidates(Candidates):
 
     def get_feature_array(self, feature: Union[Type[Descriptor], str]) -> np.ndarray:
         try:
-            return np.array([c.event.get_feature(feature).value for c in self._candidates])
+            return np.array([c.event.get_descriptor(feature).value for c in self._candidates])
         except KeyError as e:
             raise DescriptorError(e)
 

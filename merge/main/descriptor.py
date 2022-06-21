@@ -65,6 +65,7 @@ class Descriptor(Generic[T], Parsable['Descriptor'], ABC):
 
             In context, the usage would be
                 `descriptor_that_the_prospector_has_been_trained_on.compatible_with(type(influence_descriptor))`
+
             """
         return issubclass(descriptor_type, cls) or descriptor_type in cls._compatible_descriptors()
 
@@ -103,7 +104,7 @@ class MidiPitch(IntegralDescriptor):
 
 
 class Chroma12(FixedVectorialFeature):
-    """ Base class for 12-dimensional chroma-based features.
+    """ Base class for 12-dimensional chroma-based descriptors.
         Stored as a numpy array with shape (12,)
     """
     SIZE = 12

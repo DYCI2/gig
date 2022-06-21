@@ -223,7 +223,7 @@ class AsyncOscWithStatus(AsyncOsc, ABC):
                          *args, **kwargs)
         self.status_interval_s: float = status_interval_s
 
-        self._map: Dict[str, Tuple[Component, str]] = {}
+        self._map: Dict[str, Tuple[Component, str]] = {}    # {osc_address: (component, osc_status_address)}
         self.add_async_target(self.heartbeat_loop)
 
     async def heartbeat_loop(self) -> None:
@@ -267,6 +267,10 @@ class AsyncOscWithStatus(AsyncOsc, ABC):
             return self._map[osc_address][0]
         except KeyError:
             raise ComponentAddressError(f"No component registered for '{osc_address}'")
+
+    @property
+    def components(self) -> List[Tuple[str, Component]]:
+        return [(address, component) for address, (component, _) in self._map.items()]
 
     @property
     def addresses(self) -> List[str]:

@@ -5,8 +5,8 @@ from typing import List, Type, Optional, TypeVar, Generic, Set, Union
 import numpy as np
 
 from merge.main.corpus_event import CorpusEvent, GenericCorpusEvent, T
-from merge.main.exceptions import CorpusError
 from merge.main.descriptor import Descriptor
+from merge.main.exceptions import CorpusError
 from merge.main.label import Label
 
 E = TypeVar('E', bound=CorpusEvent)
@@ -14,13 +14,13 @@ E = TypeVar('E', bound=CorpusEvent)
 
 class Corpus(Generic[E], ABC):
     def __init__(self, events: List[E],
-                 feature_types: Optional[List[Type[Descriptor]]] = None,
+                 descriptor_types: Optional[List[Type[Descriptor]]] = None,
                  label_types: Optional[List[Type[Label]]] = None):
-        # TODO[B4]: handle feature types (if not provided, gather all from events. Also: pre-compute feature values
+        # TODO[B4]: handle descriptor types (if not provided, gather all from events. Also: pre-compute feature values
         self.logger = logging.getLogger(__name__)
         self.events: List[E] = events
-        self.feature_types: List[Type[Descriptor]] = (feature_types if feature_types is not None
-                                                   else self.compute_feature_types(events))
+        self.descriptor_types: List[Type[Descriptor]] = (descriptor_types if descriptor_types is not None
+                                                         else self.compute_descriptor_types(events))
         self.label_types: List[Type[Label]] = (label_types if label_types is not None
                                                else self.compute_label_types(events))
 
@@ -52,14 +52,14 @@ class Corpus(Generic[E], ABC):
         """ """
 
     @staticmethod
-    def compute_feature_types(events: List[E]) -> List[Type[Descriptor]]:
+    def compute_descriptor_types(events: List[E]) -> List[Type[Descriptor]]:
         # TODO[B6]: Proper strategy to also handle strings with correct signatures
-        feature_types: Set[Type[Descriptor]] = set()
+        descriptor_types: Set[Type[Descriptor]] = set()
         for event in events:  # type: CorpusEvent
-            for feature_type in event.features.keys():
-                feature_types.add(feature_type)
+            for descriptor_type in event.descriptors.keys():
+                descriptor_types.add(descriptor_type)
 
-        return list(feature_types)
+        return list(descriptor_types)
 
     @staticmethod
     def compute_label_types(events: List[E]) -> List[Type[Label]]:
@@ -71,20 +71,20 @@ class Corpus(Generic[E], ABC):
 
         return list(label_types)
 
-    def get_features_of_type(self, feature_type: Type[Descriptor],
+    def get_descriptors_of_type(self, descriptor_type: Type[Descriptor],
                              as_array: bool = False) -> Union[List[Descriptor], np.ndarray]:
         if as_array:
-            return np.array([e.get_feature(feature_type).value for e in self.events])
+            return np.array([e.get_descriptor(descriptor_type).value for e in self.events])
         else:
-            return [e.get_feature(feature_type) for e in self.events]
+            return [e.get_descriptor(descriptor_type) for e in self.events]
 
 
 class GenericCorpus(Corpus[GenericCorpusEvent[T]]):
     def __init__(self,
                  events: List[GenericCorpusEvent[T]],
-                 feature_types: Optional[List[Type[Descriptor]]] = None,
+                 descriptor_types: Optional[List[Type[Descriptor]]] = None,
                  label_types: Optional[List[Type[Label]]] = None):
-        super().__init__(events=events, feature_types=feature_types, label_types=label_types)
+        super().__init__(events=events, descriptor_types=descriptor_types, label_types=label_types)
 
     @classmethod
     def build(cls, *args, **kwargs) -> 'GenericCorpus[T]':
@@ -101,9 +101,9 @@ class GenericCorpus(Corpus[GenericCorpusEvent[T]]):
         raise NotImplemented("Not implemented")  # TODO[B6]
 
     def append(self, event: GenericCorpusEvent[T]) -> None:
-        for feature in event.features:
-            if feature not in self.feature_types:
-                raise CorpusError(f"Feature {feature.__class__.__name__} does not exist in corpus {self}. "
+        for descriptor in event.descriptors:
+            if descriptor not in self.descriptor_types:
+                raise CorpusError(f"Descriptor {descriptor.__class__.__name__} does not exist in corpus {self}. "
                                   f"Could not add event")
         for label in event.labels:
             if label not in self.label_types:

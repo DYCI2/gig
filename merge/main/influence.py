@@ -25,7 +25,7 @@ class CorpusInfluence(Influence[CorpusEvent]):
     pass
 
 
-class FeatureInfluence(Influence[Descriptor]):
+class DescriptorInfluence(Influence[Descriptor]):
     """ Class to trigger incrementation of state based on a `Feature` """
     pass
 
