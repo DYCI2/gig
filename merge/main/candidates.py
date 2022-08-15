@@ -102,6 +102,10 @@ class ListCandidates(Candidates):
         else:
             self.corpora.add(associated_corpus)
 
+    @classmethod
+    def new_empty(cls, associated_corpus: Optional[Corpus] = None):
+        return cls([], associated_corpus=associated_corpus)
+
     def shallow_copy(self) -> 'Candidates':
         return ListCandidates([c.shallow_copy() for c in self._candidates])
 

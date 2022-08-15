@@ -33,3 +33,6 @@ class DescriptorInfluence(Influence[Descriptor]):
 class LabelInfluence(Influence[Label]):
     """ Class to trigger incrementation of state based on a `Label` """
     pass
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(value={self.value}"

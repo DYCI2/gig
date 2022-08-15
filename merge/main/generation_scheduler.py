@@ -15,8 +15,10 @@ class GenerationScheduler(ABC):
         """ """
 
     @abstractmethod
-    def update_time(self, time: Timepoint) -> Any:
-        """ """
+    def update_performance_time(self, time: Timepoint) -> Any:
+        """ TODO: Docstring
+            raises: TimepointError if an invalid Timepoint is passed
+        """
 
     @abstractmethod
     def read_memory(self, corpus: Corpus, **kwargs) -> None:

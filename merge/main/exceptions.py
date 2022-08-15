@@ -91,3 +91,10 @@ class StateError(Exception):
 
     def __init__(self, err):
         super().__init__(err)
+
+
+class TimepointError(Exception):
+    """ Raised when an invalid timepoint (either invalid type or invalid time) is detected """
+
+    def __init__(self, err):
+        super().__init__(err)

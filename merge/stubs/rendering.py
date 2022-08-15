@@ -8,8 +8,6 @@ class RendererMessage:
 
 
 class Renderable:
-
-
     @abstractmethod
     def render(self) -> Union[List[RendererMessage], RendererMessage]:
         """ Format the object into one or multiple renderable messages that may be sent over OSC """
