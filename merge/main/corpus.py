@@ -109,3 +109,5 @@ class GenericCorpus(Corpus[GenericCorpusEvent[T]]):
             if label not in self.label_types:
                 raise CorpusError(f"Label {label.__class__.__name__} does not exist in corpus {self}. "
                                   f"Could not add event")
+
+        self.events.append(event)

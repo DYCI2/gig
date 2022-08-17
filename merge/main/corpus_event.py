@@ -2,7 +2,7 @@ import logging
 from typing import Dict, Union, Type, List, Optional, Generic, TypeVar
 
 from merge.main.descriptor import Descriptor
-from merge.main.exceptions import DescriptorError
+from merge.main.exceptions import DescriptorError, LabelError
 from merge.main.label import Label
 from merge.stubs.note import Note
 
@@ -59,7 +59,7 @@ class CorpusEvent:
         try:
             return self.labels[label_type]
         except KeyError as e:
-            raise DescriptorError(f"Event '{str(self)}' does not have a label of type '{label_type.__name__}'") from e
+            raise LabelError(f"Event '{str(self)}' does not have a label of type '{label_type.__name__}'") from e
 
 
 class GenericCorpusEvent(CorpusEvent, Generic[T]):

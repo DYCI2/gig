@@ -29,11 +29,10 @@ class OscSender:
 
 class OscLogForwarder(logging.Handler):
 
-    def __init__(self, sender: OscSender, osc_log_address: str, logging_level: int = logging.INFO):
+    def __init__(self, sender: OscSender, osc_log_address: str):
         super().__init__()
         self.sender: OscSender = sender
         self.osc_log_address: str = osc_log_address
-        self.setLevel(logging_level)
 
     def emit(self, record):
         self.sender.send(self.osc_log_address, record.levelname.lower(), self.format(record))
