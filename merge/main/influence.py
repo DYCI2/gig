@@ -62,4 +62,4 @@ class LabelInfluence(Influence[Label]):
     pass
 
     def __repr__(self):
-        return f"{self.__class__.__name__}(value={self.value}"
+        return f"{self.__class__.__name__}(value={self.value})"
