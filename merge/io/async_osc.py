@@ -32,6 +32,7 @@ class AsyncOsc(Caller, ABC):
                  capture_termination_exceptions: bool = True,
                  log_to_osc: bool = True,
                  osc_log_address: Optional[str] = None,
+                 prepend_address_on_osc_call: bool = True,
                  *args, **kwargs):
         super().__init__(parse_parenthesis_as_list=False,
                          discard_duplicate_args=discard_duplicate_args,
@@ -49,6 +50,8 @@ class AsyncOsc(Caller, ABC):
 
         self.osc_log_handler: Optional[OscLogForwarder] = None
         self.osc_log_address: Optional[str] = None
+
+        self.prepend_address_on_osc_call: bool = prepend_address_on_osc_call
 
         if log_to_osc:
             self.osc_log_address = default_address if osc_log_address is None else osc_log_address
@@ -144,7 +147,7 @@ class AsyncOsc(Caller, ABC):
     def __process_osc(self, address: str, *args):
         args_str: str = MaxFormatter.format_as_string(*args)
         try:
-            self.call(args_str, prepend_args=[address])
+            self.call(args_str, prepend_args=[address] if self.prepend_address_on_osc_call else None)
 
         # Called with wrong number of arguments, with duplicate arguments or calling function that doesn't exist
         except MaxOscError as e:
