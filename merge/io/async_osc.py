@@ -136,15 +136,15 @@ class AsyncOsc(Caller, ABC):
         osc_dispatcher: Dispatcher = Dispatcher()
         # python-osc will regexp-replace '*' with '[^/]*?/*', resulting in matches between /some_address and
         # /some_address2 even when the goal is to match only /some_address/some_child, hence the additional regex
-        osc_dispatcher.map(f"{self.default_address}($|/*)", self.__process_osc)
-        osc_dispatcher.set_default_handler(self.__unmatched_osc)
+        osc_dispatcher.map(f"{self.default_address}($|/*)", self._process_osc)
+        osc_dispatcher.set_default_handler(self._unmatched_osc)
         self._server: AsyncIOOSCUDPServer = AsyncIOOSCUDPServer((self.ip, self.recv_port),
                                                                 osc_dispatcher, asyncio.get_event_loop())
         transport, protocol = await self._server.create_serve_endpoint()
         await asyncio.gather(self._main_loop(), *[f() for f in self._async_targets])
         transport.close()
 
-    def __process_osc(self, address: str, *args):
+    def _process_osc(self, address: str, *args):
         args_str: str = MaxFormatter.format_as_string(*args)
         try:
             self.call(args_str, prepend_args=[address] if self.prepend_address_on_osc_call else None)
@@ -161,7 +161,7 @@ class AsyncOsc(Caller, ABC):
             if self.reraise_exceptions:
                 raise
 
-    def __unmatched_osc(self, address: str, *_args, **_kwargs) -> None:
+    def _unmatched_osc(self, address: str, *args) -> None:
         self.logger.warning(f"The address '{address}' does not exist.")
 
     @staticmethod
