@@ -5,7 +5,7 @@ from merge.main.candidate import Candidate
 from merge.main.candidates import Candidates
 
 
-class Jury(ABC):
+class CandidateSelector(ABC):
 
     @abstractmethod
     def decide(self, candidates: Candidates) -> Optional[Candidate]:
