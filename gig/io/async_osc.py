@@ -11,11 +11,11 @@ from maxosc.maxformatter import MaxFormatter
 from pythonosc.dispatcher import Dispatcher
 from pythonosc.osc_server import AsyncIOOSCUDPServer
 
-from merge.io.component import Component
-from merge.io.osc_sender import OscSender, OscLogForwarder
-from merge.io.osc_status import Status
-from merge.main.exceptions import ConfigurationError, ComponentAddressError
-from merge.stubs.rendering import Renderable
+from gig.io.component import Component
+from gig.io.osc_sender import OscSender, OscLogForwarder
+from gig.io.osc_status import Status
+from gig.main.exceptions import ConfigurationError, ComponentAddressError
+from gig.stubs.rendering import Renderable
 
 
 class AsyncOsc(Caller, ABC):

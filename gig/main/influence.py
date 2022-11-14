@@ -2,9 +2,9 @@ from abc import ABC
 from collections.abc import Iterable
 from typing import TypeVar, Generic, List, Union, Type, Any
 
-from merge.main.corpus_event import CorpusEvent
-from merge.main.descriptor import Descriptor
-from merge.main.label import Label
+from gig.main.corpus_event import CorpusEvent
+from gig.main.descriptor import Descriptor
+from gig.main.label import Label
 
 T = TypeVar('T')
 

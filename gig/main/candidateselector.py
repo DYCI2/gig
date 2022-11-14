@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from merge.main.candidate import Candidate
-from merge.main.candidates import Candidates
+from gig.main.candidate import Candidate
+from gig.main.candidates import Candidates
 
 
 class CandidateSelector(ABC):

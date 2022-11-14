@@ -4,10 +4,10 @@ from typing import List, Type, Optional, TypeVar, Generic, Set, Union
 
 import numpy as np
 
-from merge.main.corpus_event import CorpusEvent, GenericCorpusEvent, T
-from merge.main.descriptor import Descriptor
-from merge.main.exceptions import CorpusError
-from merge.main.label import Label
+from gig.main.corpus_event import CorpusEvent, GenericCorpusEvent, T
+from gig.main.descriptor import Descriptor
+from gig.main.exceptions import CorpusError
+from gig.main.label import Label
 
 E = TypeVar('E', bound=CorpusEvent)
 

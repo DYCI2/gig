@@ -2,10 +2,10 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Optional, TypeVar, Generic, List, Union
 
-from merge.main.exceptions import QueryError
-from merge.main.influence import Influence
-from merge.stubs.pathspec import PathSpec
-from merge.stubs.timepoint import Timepoint
+from gig.main.exceptions import QueryError
+from gig.main.influence import Influence
+from gig.stubs.pathspec import PathSpec
+from gig.stubs.timepoint import Timepoint
 
 T = TypeVar('T')
 

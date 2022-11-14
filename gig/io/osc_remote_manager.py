@@ -1,8 +1,8 @@
 # TODO: Remove
 # from typing import Dict, List, Tuple
 #
-# from merge.io.component import Component
-# from merge.main.exceptions import ComponentAddressError
+# from gig.io.component import Component
+# from gig.main.exceptions import ComponentAddressError
 #
 #
 # class OscRemoteManager:

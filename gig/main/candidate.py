@@ -1,8 +1,8 @@
 from typing import Optional, Union
 
-from merge.main.corpus import Corpus
-from merge.main.corpus_event import CorpusEvent
-from merge.stubs.transform import Transform
+from gig.main.corpus import Corpus
+from gig.main.corpus_event import CorpusEvent
+from gig.stubs.transform import Transform
 
 
 class Candidate:

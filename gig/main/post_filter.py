@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-from merge.io.parsable import Parsable
-from merge.main.candidate import Candidate
-from merge.main.candidates import Candidates
+from gig.io.parsable import Parsable
+from gig.main.candidate import Candidate
+from gig.main.candidates import Candidates
 
 
 class PostFilter(Parsable, ABC):

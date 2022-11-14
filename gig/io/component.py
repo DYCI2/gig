@@ -1,9 +1,9 @@
 import collections.abc
 from typing import List, Any, Tuple, Iterable, Dict
 
-from merge.io.addressable import Addressable
-from merge.io.parameter import Parameter
-from merge.main.exceptions import InputError
+from gig.io.addressable import Addressable
+from gig.io.parameter import Parameter
+from gig.main.exceptions import InputError
 
 
 class Component(Addressable):

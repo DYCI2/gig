@@ -4,7 +4,7 @@ import sys
 from types import ModuleType
 from typing import Type, Any, Optional, List, Union, Dict, TypeVar
 
-from merge.main.exceptions import ConfigurationError
+from gig.main.exceptions import ConfigurationError
 
 T = TypeVar('T')
 

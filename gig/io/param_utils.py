@@ -3,7 +3,7 @@ from typing import TypeVar, Generic, Iterable, Optional, Any
 
 import numpy as np
 
-from merge.main.exceptions import ConfigurationError
+from gig.main.exceptions import ConfigurationError
 
 T = TypeVar('T')
 

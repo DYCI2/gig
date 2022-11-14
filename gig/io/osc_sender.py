@@ -5,7 +5,7 @@ from typing import Union, List
 from maxosc.maxformatter import MaxFormatter
 from pythonosc.udp_client import SimpleUDPClient
 
-from merge.stubs.rendering import Renderable, RendererMessage
+from gig.stubs.rendering import Renderable, RendererMessage
 
 
 class OscSender:

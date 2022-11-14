@@ -1,10 +1,10 @@
 import logging
 from typing import Dict, Union, Type, List, Optional, Generic, TypeVar
 
-from merge.main.descriptor import Descriptor
-from merge.main.exceptions import DescriptorError, LabelError
-from merge.main.label import Label
-from merge.stubs.note import Note
+from gig.main.descriptor import Descriptor
+from gig.main.exceptions import DescriptorError, LabelError
+from gig.main.label import Label
+from gig.stubs.note import Note
 
 T = TypeVar('T')
 

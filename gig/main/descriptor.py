@@ -3,8 +3,8 @@ from typing import TypeVar, Generic, Type, List
 
 import numpy as np
 
-from merge.io.parsable import Parsable
-from merge.main.exceptions import DescriptorError
+from gig.io.parsable import Parsable
+from gig.main.exceptions import DescriptorError
 
 T = TypeVar('T')
 

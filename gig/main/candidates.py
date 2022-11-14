@@ -3,11 +3,11 @@ from typing import List, Type, Union, Optional, Set
 
 import numpy as np
 
-from merge.main.corpus import Corpus
-from merge.main.candidate import Candidate
-from merge.main.exceptions import DescriptorError
-from merge.main.descriptor import Descriptor
-from merge.stubs.transform import Transform
+from gig.main.corpus import Corpus
+from gig.main.candidate import Candidate
+from gig.main.exceptions import DescriptorError
+from gig.main.descriptor import Descriptor
+from gig.stubs.transform import Transform
 
 
 class Candidates(ABC):

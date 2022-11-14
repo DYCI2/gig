@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import List, Any
 
-from merge.main.corpus import Corpus
-from merge.main.corpus_event import CorpusEvent
-from merge.main.query import Query
-from merge.stubs.timepoint import Timepoint
+from gig.main.corpus import Corpus
+from gig.main.corpus_event import CorpusEvent
+from gig.main.query import Query
+from gig.stubs.timepoint import Timepoint
 
 
 class GenerationScheduler(ABC):

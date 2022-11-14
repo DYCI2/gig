@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Union
 
-from merge.main.descriptor import Descriptor
-from merge.main.label import Label
+from gig.main.descriptor import Descriptor
+from gig.main.label import Label
 
 
 class Transform(ABC):

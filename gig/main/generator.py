@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from merge.main.corpus import Corpus
-from merge.main.candidate import Candidate
-from merge.main.corpus_event import CorpusEvent
-from merge.main.query import Query
+from gig.main.corpus import Corpus
+from gig.main.candidate import Candidate
+from gig.main.corpus_event import CorpusEvent
+from gig.main.query import Query
 
 
 class Generator(ABC):

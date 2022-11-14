@@ -1,8 +1,8 @@
 from typing import TypeVar, Generic, Optional, Callable, List, Union
 
-from merge.io.addressable import Addressable
-from merge.io.param_utils import MaxType, ParameterRange
-from merge.main.exceptions import ParameterError, ConfigurationError
+from gig.io.addressable import Addressable
+from gig.io.param_utils import MaxType, ParameterRange
+from gig.main.exceptions import ParameterError, ConfigurationError
 
 T = TypeVar('T')
 

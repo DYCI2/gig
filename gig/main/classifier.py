@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Type
 
-from merge.io.parsable import Parsable
-from merge.main.descriptor import Descriptor, IntegralDescriptor, MidiPitch
-from merge.main.exceptions import ClassificationError
-from merge.main.label import Label, IntLabel
+from gig.io.parsable import Parsable
+from gig.main.descriptor import Descriptor, IntegralDescriptor, MidiPitch
+from gig.main.exceptions import ClassificationError
+from gig.main.label import Label, IntLabel
 
 
 class Classifier(Parsable['Classifier'], ABC):

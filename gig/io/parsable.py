@@ -2,8 +2,8 @@ from abc import ABC, abstractmethod
 from enum import Enum
 from typing import TypeVar, Generic, Type
 
-from merge.io.introspective import Introspective
-from merge.main.exceptions import InputError
+from gig.io.introspective import Introspective
+from gig.main.exceptions import InputError
 
 T = TypeVar('T')
 
